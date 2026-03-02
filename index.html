@@ -1,0 +1,2822 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Painel de Estudos | PRF Administrativo</title>
+
+    <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <link
+      id="favicon"
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5 L10 25 L10 60 C10 85 50 95 50 95 C50 95 90 85 90 60 L90 25 Z' fill='%23002855' stroke='%23eab308' stroke-width='5'/%3E%3Ctext x='50' y='58' font-family='sans-serif' font-size='32' font-weight='bold' fill='%23eab308' text-anchor='middle' dominant-baseline='middle'%3EPRF%3C/text%3E%3C/svg%3E"
+    />
+    <link
+      id="apple-icon"
+      rel="apple-touch-icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23002855'/%3E%3Cpath d='M50 15 L20 30 L20 60 C20 80 50 90 50 90 C50 90 80 80 80 60 L80 30 Z' fill='%23002855' stroke='%23eab308' stroke-width='5'/%3E%3Ctext x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' fill='%23eab308' text-anchor='middle' dominant-baseline='middle'%3EPRF%3C/text%3E%3C/svg%3E"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+      :root {
+        --bg-color: #f8fafc;
+        --surface-color: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --primary-color: #002855;
+        --primary-hover: #004080;
+        --accent-color: #eab308;
+        --accent-hover: #ca8a04;
+        --success: #10b981;
+        --danger: #ef4444;
+        --fire: #ff5722;
+        --border-color: #e2e8f0;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-md:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg:
+          0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --radius-md: 12px;
+        --radius-lg: 16px;
+      }
+
+      [data-theme="dark"] {
+        --bg-color: #0f172a;
+        --surface-color: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --primary-color: #3b82f6;
+        --primary-hover: #60a5fa;
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        transition:
+          background-color 0.3s,
+          color 0.3s,
+          border-color 0.3s;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+        overscroll-behavior-y: none;
+      }
+
+      button,
+      a,
+      input,
+      select,
+      textarea,
+      .waiting-item {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      button:active,
+      .action-icon-btn:active,
+      .stepper-btn:active,
+      .timer-btn:active {
+        transform: scale(0.92) !important;
+        opacity: 0.8;
+        transition:
+          transform 0.05s,
+          opacity 0.05s;
+      }
+
+      /* Navbar */
+      .navbar {
+        background-color: var(--surface-color);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .logo {
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+      .logo i {
+        color: var(--accent-color);
+        font-size: 1.5rem;
+      }
+      .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      /* Status de Conexão Firebase */
+      .status-badge-top {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        transition: all 0.3s;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--text-muted);
+        transition: all 0.3s;
+      }
+      .status-badge-top.online {
+        border-color: var(--success);
+        color: var(--success);
+        background: rgba(16, 185, 129, 0.05);
+      }
+      .status-badge-top.online .status-dot {
+        background-color: var(--success);
+        box-shadow: 0 0 6px var(--success);
+      }
+      .status-badge-top.offline {
+        border-color: var(--danger);
+        color: var(--danger);
+        background: rgba(239, 68, 68, 0.05);
+      }
+      .status-badge-top.offline .status-dot {
+        background-color: var(--danger);
+      }
+      .status-badge-top.local {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+        background: rgba(234, 179, 8, 0.05);
+      }
+      .status-badge-top.local .status-dot {
+        background-color: var(--accent-color);
+      }
+      .status-badge-top.syncing {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+        background: rgba(234, 179, 8, 0.05);
+      }
+      .status-badge-top.syncing .status-dot {
+        background-color: var(--accent-color);
+        animation: pulse 1s infinite;
+      }
+
+      .action-icon-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.4rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        padding: 6px;
+        transition: all 0.2s;
+      }
+      .action-icon-btn:hover {
+        color: var(--primary-color);
+        background-color: var(--border-color);
+      }
+      .action-icon-btn.danger:hover {
+        color: var(--danger);
+        background-color: rgba(239, 68, 68, 0.1);
+      }
+      .user-profile {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .user-name-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: background 0.2s;
+      }
+      .user-name-row:hover {
+        background: var(--border-color);
+      }
+      .streak-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--fire);
+        font-weight: 800;
+        background: rgba(255, 87, 34, 0.1);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+      }
+      .rank-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        background: rgba(0, 40, 85, 0.1);
+        padding: 3px 10px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      [data-theme="dark"] .rank-badge {
+        background: rgba(59, 130, 246, 0.2);
+        color: var(--primary-hover);
+      }
+      .motivational-quote {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-style: italic;
+        margin-top: 5px;
+        text-align: right;
+        max-width: 250px;
+      }
+      .header-user-area {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      /* Container & Grids */
+      .container {
+        max-width: 1300px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+      }
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .tools-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+      @media (max-width: 900px) {
+        .tools-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Cards */
+      .panel-card {
+        background: var(--surface-color);
+        padding: 1.8rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+      }
+      .panel-title {
+        font-size: 1.1rem;
+        color: var(--text-main);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+      }
+      .panel-title i {
+        color: var(--primary-color);
+      }
+
+      /* Goals */
+      .daily-goals {
+        text-align: center;
+        justify-content: center;
+      }
+      .goal-tracker {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .goal-tracker span.total {
+        font-size: 1.5rem;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s;
+        width: 100%;
+        margin-top: 1rem;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+      .btn-primary:disabled {
+        background-color: var(--border-color);
+        color: var(--text-muted);
+        cursor: not-allowed;
+      }
+      .btn-primary.success {
+        background-color: var(--success);
+      }
+      .btn-edit-small {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: var(--bg-color);
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        border: 1px solid var(--border-color);
+      }
+      .btn-edit-small:hover {
+        background: var(--accent-color);
+        color: white;
+        border-color: var(--accent-color);
+      }
+
+      /* Charts & Predictions */
+      .chart-container {
+        position: relative;
+        height: 160px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .prediction-text {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        background: var(--bg-color);
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px dashed var(--border-color);
+      }
+
+      /* Pomodoro */
+      .timer-display {
+        font-size: 4rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        text-align: center;
+        margin: 0.5rem 0;
+        font-variant-numeric: tabular-nums;
+      }
+      .timer-controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 1.5rem;
+      }
+      .timer-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: var(--shadow-sm);
+      }
+      .timer-btn:hover {
+        background-color: var(--primary-hover);
+        transform: scale(1.05);
+      }
+      .timer-btn.secondary {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+      }
+      .timer-btn.secondary:hover {
+        background-color: var(--border-color);
+      }
+      .timer-modes {
+        display: flex;
+        background: var(--bg-color);
+        border-radius: 30px;
+        padding: 4px;
+      }
+      .mode-btn {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 0.5rem;
+        border-radius: 30px;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .mode-btn.active {
+        background: var(--surface-color);
+        color: var(--primary-color);
+        box-shadow: var(--shadow-sm);
+      }
+      .pomodoro-marks {
+        font-size: 1.2rem;
+        margin-top: 10px;
+        min-height: 25px;
+        letter-spacing: 5px;
+        text-align: center;
+      }
+
+      /* Tools */
+      .notepad-textarea {
+        width: 100%;
+        height: 150px;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-color);
+        color: var(--text-main);
+        resize: none;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .notepad-textarea:focus {
+        border-color: var(--primary-color);
+      }
+      .daily-log-list {
+        max-height: 150px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 5px;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+      .daily-log-list::-webkit-scrollbar {
+        width: 6px;
+      }
+      .daily-log-list::-webkit-scrollbar-track {
+        background: var(--bg-color);
+        border-radius: 4px;
+      }
+      .daily-log-list::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+      }
+      .log-item {
+        display: flex;
+        gap: 10px;
+        font-size: 0.9rem;
+        padding: 10px;
+        background: var(--bg-color);
+        border-radius: 6px;
+        border-left: 3px solid var(--primary-color);
+        animation: fadeIn 0.4s ease;
+      }
+      .log-time {
+        font-weight: bold;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        min-width: 45px;
+      }
+
+      /* Subjects Grid */
+      .section-header {
+        margin: 2rem 0 1.5rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .section-header h2 {
+        font-size: 1.5rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .grid-subjects {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+      }
+      .subject-card {
+        background: var(--surface-color);
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+      .subject-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-color);
+      }
+      .subject-card.completed::before {
+        background: var(--success);
+      }
+      .subject-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        min-height: 2.8rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 5px;
+      }
+      .subject-stats {
+        display: flex;
+        justify-content: space-between;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 0.8rem;
+      }
+      .progress-track {
+        background-color: var(--border-color);
+        border-radius: 10px;
+        height: 8px;
+        width: 100%;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+      }
+      .progress-fill {
+        background-color: var(--primary-color);
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .progress-fill.completed {
+        background-color: var(--success);
+      }
+      .progress-fill.goal {
+        background-color: var(--accent-color);
+      }
+      .subject-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px dashed var(--border-color);
+      }
+      .stepper-badge {
+        display: flex;
+        align-items: center;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 30px;
+        padding: 0.4rem;
+        box-shadow: var(--shadow-sm);
+        gap: 12px;
+        margin: 5px 0;
+      }
+      .stepper-value {
+        font-weight: 700;
+        color: var(--primary-color);
+        font-size: 1.05rem;
+        min-width: 70px;
+        text-align: center;
+      }
+      .stepper-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid var(--border-color);
+        background: var(--surface-color);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s;
+        font-size: 1rem;
+      }
+      .stepper-btn:hover:not(:disabled) {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+      .stepper-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        box-shadow: none;
+        background: var(--bg-color);
+      }
+
+      /* Waiting List & Drag Drop */
+      .waiting-list {
+        background: var(--surface-color);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+      .waiting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        cursor: grab;
+        background: var(--surface-color);
+        transition: background-color 0.2s;
+      }
+      .waiting-item:last-child {
+        border-bottom: none;
+      }
+      .waiting-item:active {
+        cursor: grabbing;
+      }
+      .waiting-item.drag-over {
+        border-top: 3px solid var(--primary-color);
+        background-color: rgba(0, 40, 85, 0.05);
+      }
+      [data-theme="dark"] .waiting-item.drag-over {
+        border-top: 3px solid var(--primary-hover);
+        background-color: rgba(59, 130, 246, 0.1);
+      }
+      .waiting-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .waiting-number {
+        background: var(--bg-color);
+        color: var(--text-muted);
+        width: 28px;
+        height: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: move;
+      }
+      .status-badge {
+        background: var(--bg-color);
+        color: var(--text-muted);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      /* Toasts, Modals, Animations */
+      .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+      }
+      .toast {
+        background: var(--surface-color);
+        color: var(--text-main);
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        transform: translateX(120%);
+        animation: slideIn 0.3s forwards;
+        border-left: 4px solid var(--primary-color);
+      }
+      .toast.success {
+        border-left-color: var(--success);
+      }
+      .toast.warning {
+        border-left-color: var(--accent-color);
+      }
+      .toast.danger {
+        border-left-color: var(--danger);
+      }
+      .toast i {
+        font-size: 1.3rem;
+      }
+      .toast.success i {
+        color: var(--success);
+      }
+      .toast.danger i {
+        color: var(--danger);
+      }
+      @keyframes slideIn {
+        to {
+          transform: translateX(0);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .pulse-animation {
+        animation: pulse 1.5s infinite;
+        box-shadow: 0 0 0 0 rgba(0, 40, 85, 0.4);
+      }
+      [data-theme="dark"] .pulse-animation {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 var(--primary-color);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(0, 40, 85, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(0, 40, 85, 0);
+        }
+      }
+
+      @keyframes promote {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.15);
+          background-color: var(--accent-color);
+          color: white;
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .rank-promote {
+        animation: promote 0.8s ease-in-out;
+      }
+
+      .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .modal-backdrop.show {
+        display: flex;
+        opacity: 1;
+      }
+      .modal-content {
+        background: var(--surface-color);
+        width: 90%;
+        max-width: 650px;
+        max-height: 85vh;
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        box-shadow: var(--shadow-lg);
+        overflow-y: auto;
+        position: relative;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+      .modal-backdrop.show .modal-content {
+        transform: translateY(0);
+      }
+      .close-modal-btn {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .close-modal-btn:hover {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+      }
+      .tactical-step {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .tactical-step:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+      .tactical-step h3 {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tactical-step ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      .tactical-step li {
+        position: relative;
+        padding-left: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+      .tactical-step li::before {
+        content: "•";
+        color: var(--accent-color);
+        font-weight: bold;
+        font-size: 1.2rem;
+        position: absolute;
+        left: 0;
+        top: -2px;
+      }
+
+      .auth-input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-color);
+        color: var(--text-main);
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+      .auth-input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+      }
+
+      /* --- RESPONSIVIDADE MOBILE / TABLET --- */
+      @media (max-width: 650px) {
+        .hide-mobile {
+          display: none !important;
+        }
+        .navbar {
+          padding: 1rem 0.8rem;
+        }
+        .nav-controls {
+          gap: 0.5rem;
+        }
+        .action-icon-btn {
+          font-size: 1.2rem;
+          padding: 4px;
+        }
+
+        /* Aumenta botões de toque para a regra dos 40px no mobile */
+        .stepper-btn {
+          width: 40px;
+          height: 40px;
+          font-size: 1.2rem;
+        }
+        .btn-edit-small {
+          width: 34px;
+          height: 34px;
+          font-size: 1.1rem;
+        }
+
+        /* Ajustes Drag & Drop Mobile */
+        .desktop-drag-handle {
+          display: none !important;
+        }
+        .mobile-order-controls {
+          display: flex !important;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .mobile-order-btn {
+          background: var(--bg-color);
+          border: 1px solid var(--border-color);
+          border-radius: 4px;
+          padding: 4px 8px;
+          color: var(--text-muted);
+          font-size: 0.9rem;
+          cursor: pointer;
+        }
+        .mobile-order-btn:active {
+          background: var(--primary-color);
+          color: white;
+        }
+      }
+
+      @media (min-width: 651px) {
+        .mobile-order-controls {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar">
+      <div
+        class="logo"
+        onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        title="Voltar ao topo"
+      >
+        <i
+          class="ph-fill ph-shield-check"
+          style="filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2))"
+        ></i>
+        <span
+          class="hide-mobile"
+          style="display: flex; align-items: center; gap: 10px"
+        >
+          <span style="font-weight: 900; letter-spacing: 1px">PRF</span>
+          <span
+            style="
+              width: 5px;
+              height: 5px;
+              background-color: var(--accent-color);
+              border-radius: 50%;
+            "
+          ></span>
+          <span
+            style="
+              font-weight: 600;
+              color: var(--text-muted);
+              font-size: 0.8rem;
+              text-transform: uppercase;
+              letter-spacing: 2.5px;
+              margin-top: 2px;
+            "
+            >Dashboard</span
+          >
+        </span>
+      </div>
+      <div class="nav-controls">
+        <div
+          id="connection-status"
+          class="status-badge-top offline"
+          title="Status de Sincronização"
+        >
+          <div class="status-dot"></div>
+          <span class="hide-mobile" id="connection-text">A Conectar...</span>
+        </div>
+
+        <button
+          class="action-icon-btn"
+          onclick="openModal('tactical-modal')"
+          aria-label="Manual Tático"
+          title="Manual Tático de Produtividade"
+        >
+          <i class="ph ph-book-open-text"></i>
+        </button>
+        <div
+          style="
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+            margin: 0 5px;
+          "
+        ></div>
+        <button
+          class="action-icon-btn"
+          onclick="exportData()"
+          aria-label="Exportar Backup"
+          title="Exportar Progresso"
+        >
+          <i class="ph ph-download-simple"></i>
+        </button>
+        <button
+          class="action-icon-btn"
+          onclick="triggerImport()"
+          aria-label="Importar Backup"
+          title="Importar Progresso"
+        >
+          <i class="ph ph-upload-simple"></i>
+        </button>
+        <input
+          type="file"
+          id="import-file"
+          accept=".json"
+          style="display: none"
+          onchange="importData(event)"
+        />
+        <div
+          style="
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+            margin: 0 5px;
+          "
+        ></div>
+        <button
+          class="action-icon-btn danger"
+          onclick="resetData()"
+          aria-label="Reiniciar Dados"
+          title="Reiniciar todos os dados"
+        >
+          <i class="ph ph-arrow-counter-clockwise"></i>
+        </button>
+        <button
+          class="action-icon-btn"
+          onclick="toggleTheme()"
+          aria-label="Alternar Tema"
+          title="Alternar Modo Escuro"
+        >
+          <i class="ph ph-moon" id="theme-icon"></i>
+        </button>
+
+        <div class="header-user-area hide-mobile">
+          <div class="user-profile">
+            <div
+              class="user-name-row"
+              onclick="openAuthModal()"
+              title="Gerir Conta"
+            >
+              <div
+                class="streak-badge"
+                id="streak-badge"
+                title="Dias seguidos a cumprir a meta"
+              >
+                <i
+                  class="ph-fill ph-fire"
+                  style="color: var(--accent-color)"
+                ></i>
+                <span id="streak-count">0</span>
+              </div>
+              <span id="user-display-name">Carregando...</span>
+              <i
+                class="ph-fill ph-user-circle"
+                style="font-size: 1.8rem; color: var(--primary-color)"
+              ></i>
+            </div>
+            <div class="rank-badge" id="user-rank">🥉 Aspirante</div>
+          </div>
+          <div class="motivational-quote" id="daily-quote">
+            "A dor é temporária, o cargo é para sempre."
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="dashboard-grid">
+        <section class="panel-card daily-goals">
+          <div class="panel-title" style="justify-content: center">
+            <i class="ph-fill ph-target"></i> Objetivo Diário
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.95rem">
+            Mantenha a consistência diária.
+          </p>
+          <div class="goal-tracker">
+            <span id="aulas-hoje">0</span>
+            <span class="total" id="meta-total">/4</span>
+            <button
+              class="btn-edit-small"
+              onclick="editDailyGoal()"
+              aria-label="Editar Meta Diária"
+              title="Alterar meta"
+            >
+              <i class="ph-bold ph-pencil-simple"></i>
+            </button>
+          </div>
+          <div class="progress-track" style="height: 12px">
+            <div
+              class="progress-fill goal"
+              id="meta-fill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button
+            id="btn-goal"
+            class="btn-primary"
+            onclick="addDailyGoal()"
+            aria-label="Registrar aula genérica"
+          >
+            <i class="ph-bold ph-plus"></i> Registrar Aula do Dia
+          </button>
+        </section>
+
+        <section class="panel-card" style="text-align: center">
+          <div
+            class="panel-title"
+            style="justify-content: center; position: relative"
+          >
+            <i class="ph-fill ph-timer"></i> Cronômetro Pomodoro
+            <button
+              class="btn-edit-small"
+              onclick="configPomodoro()"
+              style="position: absolute; right: 0; top: -5px"
+              title="Configurar Tempos"
+            >
+              <i class="ph-bold ph-gear"></i>
+            </button>
+          </div>
+          <div class="timer-display" id="timer-display">50:00</div>
+          <div class="timer-controls">
+            <button
+              class="timer-btn"
+              onclick="toggleTimer()"
+              aria-label="Iniciar ou Pausar"
+            >
+              <i class="ph-fill ph-play" id="timer-play-icon"></i>
+            </button>
+            <button
+              class="timer-btn secondary"
+              onclick="resetTimer()"
+              aria-label="Reiniciar"
+            >
+              <i class="ph-bold ph-arrow-counter-clockwise"></i>
+            </button>
+          </div>
+          <div class="timer-modes">
+            <button
+              class="mode-btn active"
+              id="btn-mode-study"
+              onclick="setTimerMode('study')"
+            >
+              Estudo
+            </button>
+            <button
+              class="mode-btn"
+              id="btn-mode-break"
+              onclick="setTimerMode('break')"
+            >
+              Pausa
+            </button>
+          </div>
+          <div
+            class="pomodoro-marks"
+            id="pomodoro-marks"
+            title="Ciclos concluídos hoje"
+          ></div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-title">
+            <i class="ph-fill ph-chart-pie-slice"></i> Progresso do Edital
+          </div>
+          <div class="chart-container">
+            <canvas id="progressChart" aria-label="Gráfico do edital"></canvas>
+          </div>
+          <p
+            id="chart-subtitle"
+            style="
+              text-align: center;
+              margin-top: 10px;
+              font-weight: 600;
+              font-size: 0.9rem;
+            "
+          ></p>
+          <div class="prediction-text" id="prediction-text">
+            <i
+              class="ph-bold ph-calendar-check"
+              style="color: var(--primary-color)"
+            ></i>
+            Previsão: Calculando...
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-title">
+            <i class="ph-fill ph-chart-bar"></i> Produtividade (7 Dias)
+          </div>
+          <div class="chart-container" style="height: 170px">
+            <canvas id="weeklyChart" aria-label="Gráfico Semanal"></canvas>
+          </div>
+          <p
+            style="
+              text-align: center;
+              margin-top: 10px;
+              font-size: 0.85rem;
+              color: var(--text-muted);
+            "
+          >
+            Evite o esgotamento: mantenha as barras consistentes.
+          </p>
+        </section>
+      </div>
+
+      <div class="tools-grid">
+        <section class="panel-card" style="padding: 1.5rem">
+          <div class="panel-title" style="justify-content: space-between">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <i class="ph-fill ph-notepad"></i> Bloco de Notas Tático
+            </div>
+            <button
+              class="btn-edit-small"
+              onclick="manualSaveNotes()"
+              title="Salvar Notas"
+              style="
+                width: auto;
+                padding: 0 12px;
+                border-radius: 15px;
+                font-weight: 600;
+              "
+            >
+              <i class="ph-bold ph-floppy-disk"></i> Salvar
+            </button>
+          </div>
+          <textarea
+            id="tactical-notes"
+            class="notepad-textarea"
+            placeholder="Ex: Dir. Administrativo - Parei na aula 14 aos 25:00 min..."
+            oninput="autoSaveNotes()"
+          ></textarea>
+        </section>
+
+        <section class="panel-card" style="padding: 1.5rem">
+          <div class="panel-title">
+            <i class="ph-fill ph-list-checks"></i> Registro de Missões (Hoje)
+          </div>
+          <div class="daily-log-list" id="daily-log-list"></div>
+        </section>
+      </div>
+
+      <header class="section-header">
+        <h2>
+          <i
+            class="ph-fill ph-books"
+            style="font-size: 1.8rem; color: var(--primary-color)"
+          ></i>
+          Núcleo Duro (Fase Atual)
+        </h2>
+      </header>
+      <section class="grid-subjects" id="active-subjects"></section>
+
+      <header
+        class="section-header"
+        id="completed-header"
+        style="display: none"
+      >
+        <h2>
+          <i
+            class="ph-fill ph-check-circle"
+            style="font-size: 1.8rem; color: var(--success)"
+          ></i>
+          Disciplinas Concluídas
+        </h2>
+      </header>
+      <section class="grid-subjects" id="completed-subjects"></section>
+
+      <header class="section-header">
+        <h2>
+          <i
+            class="ph-fill ph-hourglass-high"
+            style="font-size: 1.8rem; color: var(--text-muted)"
+          ></i>
+          Fila de Espera
+        </h2>
+        <button
+          class="btn-edit-small"
+          onclick="addSubject()"
+          title="Adicionar nova matéria ao edital"
+          style="
+            width: auto;
+            padding: 0 12px;
+            border-radius: 15px;
+            font-weight: 600;
+          "
+        >
+          <i class="ph-bold ph-plus"></i> Nova Disciplina
+        </button>
+      </header>
+      <section class="waiting-list" id="waiting-subjects"></section>
+    </main>
+
+    <!-- Modal de Autenticação -->
+    <div class="modal-backdrop" id="auth-modal" onclick="closeAuthModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-modal-btn" onclick="closeAuthModal(event)">
+          <i class="ph-bold ph-x"></i>
+        </button>
+        <h2
+          style="
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          "
+        >
+          <i class="ph-fill ph-user-circle"></i> Conta PRF
+        </h2>
+        <p
+          style="
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+          "
+          id="auth-status-msg"
+        >
+          Faça login para salvar permanentemente o seu progresso na nuvem.
+        </p>
+
+        <div id="auth-form-area">
+          <input
+            type="email"
+            id="auth-email"
+            class="auth-input"
+            placeholder="E-mail de acesso"
+          />
+          <input
+            type="password"
+            id="auth-password"
+            class="auth-input"
+            placeholder="Senha"
+          />
+          <div style="display: flex; gap: 10px">
+            <button
+              class="btn-primary"
+              onclick="loginWithEmail()"
+              style="margin-top: 0"
+            >
+              Entrar
+            </button>
+            <button
+              class="btn-primary secondary"
+              onclick="registerWithEmail()"
+              style="margin-top: 0"
+            >
+              Criar Conta
+            </button>
+          </div>
+        </div>
+
+        <button
+          class="btn-primary danger"
+          onclick="logoutFirebase()"
+          style="margin-top: 10px; display: none"
+          id="btn-logout"
+        >
+          Sair da Conta
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal do Manual Tático -->
+    <div
+      class="modal-backdrop"
+      id="tactical-modal"
+      onclick="closeModal('tactical-modal', event)"
+    >
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button
+          class="close-modal-btn"
+          onclick="closeModal('tactical-modal', event)"
+        >
+          <i class="ph-bold ph-x"></i>
+        </button>
+        <h2
+          style="
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+          "
+        >
+          <i class="ph-fill ph-target"></i> Manual Tático de Produtividade
+        </h2>
+        <div class="tactical-step">
+          <h3>
+            <i class="ph-fill ph-eye"></i> 1. O Ritual de Início (Ancoragem
+            Visual)
+          </h3>
+          <ul>
+            <li>Leia a Frase Motivacional do dia.</li>
+            <li>
+              Olhe para a Previsão de Fim no gráfico. Se procrastinar, a data
+              afasta-se.
+            </li>
+          </ul>
+        </div>
+        <div class="tactical-step">
+          <h3>
+            <i class="ph-fill ph-keyboard"></i> 2. Imersão Total (A Regra do
+            "P")
+          </h3>
+          <ul>
+            <li>Bloqueie distrações.</li>
+            <li>
+              Carregue na tecla <strong>P</strong> no teclado para o Pomodoro
+              iniciar.
+            </li>
+          </ul>
+        </div>
+        <div class="tactical-step">
+          <h3>
+            <i class="ph-fill ph-brain"></i> 3. A Recompensa Imediata (Dopamina)
+          </h3>
+          <ul>
+            <li>
+              Ao ouvir o alarme, pare. Clique no <strong>+</strong> da
+              disciplina. Descanse.
+            </li>
+          </ul>
+        </div>
+        <div class="tactical-step">
+          <h3>
+            <i class="ph-fill ph-fire" style="color: var(--accent-color)"></i>
+            4. "Não Quebre a Corrente" (Streak)
+          </h3>
+          <ul>
+            <li>
+              Dias difíceis? Baixe a meta para 1 aula, mas mantenha o Streak
+              vivo.
+            </li>
+          </ul>
+        </div>
+        <div class="tactical-step">
+          <h3><i class="ph-fill ph-cloud-check"></i> 5. O Poder da Nuvem</h3>
+          <ul>
+            <li>
+              Crie uma conta para garantir que nunca perde o seu progresso. Tudo
+              será sincronizado automaticamente.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <script>
+      let draggedId = null;
+
+      function handleDragStart(e) {
+        draggedId = parseInt(e.target.dataset.id);
+        e.target.style.opacity = "0.4";
+      }
+      function handleDragEnd(e) {
+        e.target.style.opacity = "1";
+        document
+          .querySelectorAll(".waiting-item")
+          .forEach((i) => i.classList.remove("drag-over"));
+      }
+      function handleDragOver(e) {
+        e.preventDefault();
+        const item = e.target.closest(".waiting-item");
+        if (item && parseInt(item.dataset.id) !== draggedId)
+          item.classList.add("drag-over");
+      }
+      function handleDragLeave(e) {
+        const item = e.target.closest(".waiting-item");
+        if (item) item.classList.remove("drag-over");
+      }
+      function handleDrop(e) {
+        e.preventDefault();
+        const item = e.target.closest(".waiting-item");
+        if (item) {
+          item.classList.remove("drag-over");
+          const dropId = parseInt(item.dataset.id);
+          if (draggedId !== dropId && dropId) {
+            const fromIndex = window.appState.subjects.findIndex(
+              (s) => s.id === draggedId,
+            );
+            const toIndex = window.appState.subjects.findIndex(
+              (s) => s.id === dropId,
+            );
+            if (fromIndex > -1 && toIndex > -1) {
+              const element = window.appState.subjects.splice(fromIndex, 1)[0];
+              window.appState.subjects.splice(toIndex, 0, element);
+              window.saveData();
+            }
+          }
+        }
+      }
+
+      function moveSubjectOrder(id, direction) {
+        const index = window.appState.subjects.findIndex((s) => s.id === id);
+        if (index < 0) return;
+
+        const isTargetInactive =
+          !window.appState.subjects[index].active &&
+          window.appState.subjects[index].watched <
+            window.appState.subjects[index].total;
+        if (!isTargetInactive) return;
+
+        const targetIndex = index + direction;
+        if (targetIndex >= 0 && targetIndex < window.appState.subjects.length) {
+          const isSwapTargetInactive =
+            !window.appState.subjects[targetIndex].active &&
+            window.appState.subjects[targetIndex].watched <
+              window.appState.subjects[targetIndex].total;
+          if (isSwapTargetInactive) {
+            const temp = window.appState.subjects[index];
+            window.appState.subjects[index] =
+              window.appState.subjects[targetIndex];
+            window.appState.subjects[targetIndex] = temp;
+            window.saveData();
+          }
+        }
+      }
+
+      const defaultState = {
+        lastLogin: new Date().toDateString(),
+        dailyCount: 0,
+        dailyGoal: 4,
+        streak: 0,
+        lastGoalDate: null,
+        notes: "",
+        pomodorosToday: 0,
+        dailyLog: [],
+        pomodoroSettings: { study: 50, break: 10 },
+        weeklyData: {},
+        lastBackupReminder: null,
+        subjects: [
+          {
+            id: 1,
+            name: "Língua Portuguesa",
+            watched: 0,
+            total: 87,
+            active: true,
+          },
+          {
+            id: 2,
+            name: "Noções de Dir. Constitucional",
+            watched: 0,
+            total: 98,
+            active: true,
+          },
+          {
+            id: 3,
+            name: "Raciocínio Lógico",
+            watched: 0,
+            total: 52,
+            active: true,
+          },
+          {
+            id: 4,
+            name: "Noções de Dir. Administrativo",
+            watched: 0,
+            total: 70,
+            active: true,
+          },
+          {
+            id: 5,
+            name: "Noções de Informática",
+            watched: 0,
+            total: 61,
+            active: false,
+          },
+          {
+            id: 6,
+            name: "Noções de Administração",
+            watched: 0,
+            total: 65,
+            active: false,
+          },
+          {
+            id: 7,
+            name: "Noções de Arquivologia",
+            watched: 0,
+            total: 37,
+            active: false,
+          },
+          {
+            id: 8,
+            name: "Ética e Conduta Pública",
+            watched: 0,
+            total: 36,
+            active: false,
+          },
+          {
+            id: 9,
+            name: "Legislação Relativa à PRF",
+            watched: 0,
+            total: 6,
+            active: false,
+          },
+        ],
+      };
+
+      window.appState =
+        JSON.parse(localStorage.getItem("prfDashboardState")) || defaultState;
+
+      if (typeof window.appState.dailyGoal === "undefined")
+        window.appState.dailyGoal = 4;
+      if (typeof window.appState.streak === "undefined")
+        window.appState.streak = 0;
+      if (typeof window.appState.pomodorosToday === "undefined")
+        window.appState.pomodorosToday = 0;
+      if (typeof window.appState.dailyLog === "undefined")
+        window.appState.dailyLog = [];
+      if (typeof window.appState.pomodoroSettings === "undefined")
+        window.appState.pomodoroSettings = { study: 50, break: 10 };
+      if (typeof window.appState.weeklyData === "undefined")
+        window.appState.weeklyData = {};
+      if (typeof window.appState.lastBackupReminder === "undefined")
+        window.appState.lastBackupReminder = null;
+
+      window.appState.subjects = window.appState.subjects.map((s) => {
+        if (typeof s.id === "undefined")
+          s.id = Math.floor(Math.random() * 10000);
+        return s;
+      });
+      if (window.appState.subjects.length === 0)
+        window.appState.subjects = defaultState.subjects;
+
+      function saveData() {
+        localStorage.setItem(
+          "prfDashboardState",
+          JSON.stringify(window.appState),
+        );
+        renderDashboard();
+        if (typeof window.saveToFirebase === "function")
+          window.saveToFirebase();
+      }
+
+      function resetData() {
+        if (
+          confirm(
+            "⚠️ Tem certeza de que deseja reiniciar todo o ciclo do zero? Isso apagará também os dados na nuvem.",
+          )
+        ) {
+          window.appState = JSON.parse(JSON.stringify(defaultState));
+          saveData();
+          setTimeout(() => location.reload(), 500);
+        }
+      }
+
+      function addSubject() {
+        const name = prompt("Nome da nova disciplina:");
+        if (!name || name.trim() === "") return;
+        const total = parseInt(
+          prompt(`Número total de videoaulas para ${name}:`),
+        );
+        if (isNaN(total) || total <= 0) {
+          showToast("Total de aulas inválido.", "danger");
+          return;
+        }
+        const newId =
+          window.appState.subjects.length > 0
+            ? Math.max(...window.appState.subjects.map((s) => s.id)) + 1
+            : 1;
+        window.appState.subjects.push({
+          id: newId,
+          name: name.trim(),
+          watched: 0,
+          total: total,
+          active: false,
+        });
+        saveData();
+        showToast("Disciplina adicionada à Fila de Espera!", "success");
+      }
+
+      function editSubjectTotal(id) {
+        const sub = window.appState.subjects.find((s) => s.id === id);
+        if (!sub) return;
+        const input = prompt(
+          `Editar total de aulas de "${sub.name}":`,
+          sub.total,
+        );
+        const newTotal = parseInt(input);
+        if (!isNaN(newTotal) && newTotal >= sub.watched) {
+          sub.total = newTotal;
+          saveData();
+          showToast("Total atualizado!", "success");
+        } else if (newTotal < sub.watched) {
+          showToast(
+            "Erro: O novo total é menor do que as aulas já assistidas.",
+            "danger",
+          );
+        }
+      }
+
+      function openModal(id = "tactical-modal") {
+        const modal = document.getElementById(id);
+        if (modal) {
+          modal.classList.add("show");
+          document.body.style.overflow = "hidden";
+        }
+      }
+      function closeModal(id, e) {
+        if (
+          !e ||
+          e.target.id === id ||
+          e.currentTarget.classList.contains("close-modal-btn")
+        ) {
+          const modal = document.getElementById(id);
+          if (modal) {
+            modal.classList.remove("show");
+            document.body.style.overflow = "auto";
+          }
+        }
+      }
+
+      function openAuthModal() {
+        openModal("auth-modal");
+      }
+      function closeAuthModal(e) {
+        closeModal("auth-modal", e);
+      }
+
+      const htmlDoc = document.documentElement;
+
+      function updateMetaThemeColor(theme) {
+        const metaTheme = document.getElementById("meta-theme-color");
+        if (metaTheme)
+          metaTheme.setAttribute(
+            "content",
+            theme === "dark" ? "#1e293b" : "#ffffff",
+          );
+      }
+
+      function updateFavicon(theme) {
+        const bgCor = theme === "dark" ? "%230f172a" : "%23002855";
+        const fgCor = "%23eab308";
+        const faviconSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5 L10 25 L10 60 C10 85 50 95 50 95 C50 95 90 85 90 60 L90 25 Z' fill='${bgCor}' stroke='${fgCor}' stroke-width='5'/%3E%3Ctext x='50' y='58' font-family='sans-serif' font-size='32' font-weight='bold' fill='${fgCor}' text-anchor='middle' dominant-baseline='middle'%3EPRF%3C/text%3E%3C/svg%3E`;
+        const appleSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='${bgCor}'/%3E%3Cpath d='M50 15 L20 30 L20 60 C20 80 50 90 50 90 C50 90 80 80 80 60 L80 30 Z' fill='${bgCor}' stroke='${fgCor}' stroke-width='5'/%3E%3Ctext x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' fill='${fgCor}' text-anchor='middle' dominant-baseline='middle'%3EPRF%3C/text%3E%3C/svg%3E`;
+        document.getElementById("favicon").setAttribute("href", faviconSvg);
+        document.getElementById("apple-icon").setAttribute("href", appleSvg);
+      }
+
+      function initTheme() {
+        const savedTheme = localStorage.getItem("prfTheme") || "light";
+        htmlDoc.setAttribute("data-theme", savedTheme);
+        const themeIcon = document.getElementById("theme-icon");
+        if (themeIcon)
+          themeIcon.className =
+            savedTheme === "light" ? "ph ph-moon" : "ph ph-sun";
+        updateMetaThemeColor(savedTheme);
+        updateFavicon(savedTheme);
+      }
+
+      function toggleTheme() {
+        const newTheme =
+          htmlDoc.getAttribute("data-theme") === "light" ? "dark" : "light";
+        htmlDoc.setAttribute("data-theme", newTheme);
+        localStorage.setItem("prfTheme", newTheme);
+        const themeIcon = document.getElementById("theme-icon");
+        if (themeIcon)
+          themeIcon.className =
+            newTheme === "light" ? "ph ph-moon" : "ph ph-sun";
+        updateMetaThemeColor(newTheme);
+        updateFavicon(newTheme);
+        if (progressChart) updateChartTheme();
+        if (weeklyChart) updateWeeklyChart();
+      }
+
+      function showToast(message, type = "success") {
+        const container = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        const icon =
+          type === "success"
+            ? "ph-check-circle"
+            : type === "danger"
+              ? "ph-warning-circle"
+              : "ph-info";
+        toast.innerHTML = `<i class="ph-fill ${icon}"></i> <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          toast.style.transform = "translateX(100%)";
+          setTimeout(() => toast.remove(), 300);
+        }, 3500);
+      }
+
+      function triggerConfetti() {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#002855", "#eab308", "#10b981"],
+        });
+      }
+
+      function playAlarm() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(
+            440,
+            ctx.currentTime + 0.5,
+          );
+          gain.gain.setValueAtTime(0.5, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 1);
+        } catch (e) {}
+      }
+
+      const quotes = [
+        "A dor é temporária, o cargo é para sempre.",
+        "Treino difícil, combate fácil.",
+        "O sacrifício de hoje é a farda de amanhã.",
+        "Pertenceremos à gloriosa PRF!",
+        "Disciplina é a ponte entre metas e realizações.",
+        "Estude enquanto eles dormem, viva o que eles sonham.",
+        "Foco na missão, futuro Agente!",
+        "O suor de hoje poupa o sangue de amanhã.",
+        "Não pare quando estiver cansado, pare quando terminar.",
+        "A farda amarela e preta te espera.",
+        "O fracasso não resiste à persistência.",
+        "A sua aprovação só depende de você.",
+        "Um dia a mais de estudo, um dia a menos para a posse.",
+        "Força, honra e dedicação.",
+        "Faça hoje o que vai te dar orgulho amanhã.",
+        "A consistência supera o talento.",
+        "Lembre-se do porquê você começou.",
+        "Cada aula é um passo rumo à Academia Nacional da PRF.",
+        "Vença a si mesmo todos os dias.",
+        "O preço da excelência é a disciplina.",
+        "A dor da disciplina é menor que a dor do arrependimento.",
+        "A farda tem o seu peso, prepare os ombros.",
+        "Sorte é o nome que dão ao seu esforço não visto.",
+        "A aprovação é construída no silêncio do seu quarto.",
+        "Missão dada é missão cumprida.",
+        "Não existe atalho para lugares que valem a pena.",
+        "A vontade de se preparar tem que ser maior que a vontade de vencer.",
+        "Hoje concurseiro, amanhã Policial Rodoviário Federal.",
+        "O plantão te espera. Continue estudando!",
+        "Sua constância é o seu maior trunfo.",
+      ];
+      function updateDailyQuote() {
+        const d = Math.floor(
+          (new Date() - new Date(new Date().getFullYear(), 0, 0)) /
+            1000 /
+            60 /
+            60 /
+            24,
+        );
+        const quoteEl = document.getElementById("daily-quote");
+        if (quoteEl) quoteEl.innerText = '"' + quotes[d % quotes.length] + '"';
+      }
+
+      function exportData() {
+        const dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(window.appState));
+        const dl = document.createElement("a");
+        dl.setAttribute("href", dataStr);
+        dl.setAttribute(
+          "download",
+          "prf_backup_" + new Date().toISOString().slice(0, 10) + ".json",
+        );
+        document.body.appendChild(dl);
+        dl.click();
+        dl.remove();
+        showToast("Backup exportado!", "success");
+      }
+      function triggerImport() {
+        document.getElementById("import-file").click();
+      }
+      function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const imported = JSON.parse(e.target.result);
+            if (imported.subjects && imported.dailyGoal) {
+              localStorage.setItem(
+                "prfDashboardState",
+                JSON.stringify(imported),
+              );
+              showToast("Dados recuperados!", "success");
+              setTimeout(() => location.reload(), 1000);
+            }
+          } catch (err) {
+            showToast("Erro de leitura.", "danger");
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function checkNewDay() {
+        const todayStr = new Date().toDateString();
+        if (window.appState.lastLogin !== todayStr) {
+          window.appState.dailyCount = 0;
+          window.appState.pomodorosToday = 0;
+          window.appState.dailyLog = [];
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (
+            window.appState.lastGoalDate !== yesterday.toDateString() &&
+            window.appState.lastGoalDate !== todayStr
+          )
+            window.appState.streak = 0;
+          window.appState.lastLogin = todayStr;
+          saveData();
+        }
+      }
+
+      function checkBackupReminder() {
+        const today = new Date();
+        const todayStr = today.toDateString();
+        if (
+          today.getDay() === 5 &&
+          window.appState.lastBackupReminder !== todayStr
+        ) {
+          setTimeout(() => {
+            showToast(
+              "Sexta-feira! Lembre-se de exportar seu Backup Tático 💾",
+              "warning",
+            );
+          }, 2000);
+          window.appState.lastBackupReminder = todayStr;
+          saveData();
+        }
+      }
+
+      function handleGoalMet() {
+        const todayStr = new Date().toDateString();
+        if (window.appState.lastGoalDate !== todayStr) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (window.appState.lastGoalDate === yesterday.toDateString())
+            window.appState.streak++;
+          else window.appState.streak = 1;
+          window.appState.lastGoalDate = todayStr;
+        }
+        showToast("Excepcional! Meta diária atingida! 🚀", "success");
+        triggerConfetti();
+      }
+
+      function addDailyGoal() {
+        if (window.appState.dailyCount < window.appState.dailyGoal) {
+          window.appState.dailyCount++;
+          addLog("🎯 Registrou aula na Meta Diária (avulso).");
+          const isoDate = new Date().toISOString().split("T")[0];
+          window.appState.weeklyData[isoDate] =
+            (window.appState.weeklyData[isoDate] || 0) + 1;
+          if (window.appState.dailyCount === window.appState.dailyGoal)
+            handleGoalMet();
+          saveData();
+        }
+      }
+
+      function editDailyGoal() {
+        const input = prompt(
+          "Sua nova meta diária:",
+          window.appState.dailyGoal,
+        );
+        const newG = parseInt(input);
+        if (!isNaN(newG) && newG > 0) {
+          window.appState.dailyGoal = newG;
+          saveData();
+          showToast("Meta atualizada!", "success");
+        }
+      }
+
+      let timerInterval;
+      let isTimerRunning = false;
+      let currentMode = "study";
+      let timeLeft = window.appState.pomodoroSettings.study * 60;
+
+      function configPomodoro() {
+        const study = parseInt(
+          prompt(
+            "Minutos de Foco (Ex: 50):",
+            window.appState.pomodoroSettings.study,
+          ),
+        );
+        if (isNaN(study) || study <= 0) return;
+        const brk = parseInt(
+          prompt(
+            "Minutos de Pausa (Ex: 10):",
+            window.appState.pomodoroSettings.break,
+          ),
+        );
+        if (isNaN(brk) || brk <= 0) return;
+        window.appState.pomodoroSettings = { study, break: brk };
+        saveData();
+        showToast("Pomodoro configurado!", "success");
+        if (!isTimerRunning) resetTimer();
+      }
+
+      function formatTime(s) {
+        const m = Math.floor(s / 60)
+          .toString()
+          .padStart(2, "0");
+        const sec = (s % 60).toString().padStart(2, "0");
+        return `${m}:${sec}`;
+      }
+
+      function updateTimerDisplay() {
+        const t = formatTime(timeLeft);
+        const timerDisplayEl = document.getElementById("timer-display");
+        if (timerDisplayEl) timerDisplayEl.innerText = t;
+        document.title = isTimerRunning
+          ? `(${t}) Foco PRF`
+          : "Painel de Estudos | PRF Administrativo";
+        const btnModeStudy = document.getElementById("btn-mode-study");
+        if (btnModeStudy)
+          btnModeStudy.innerText = `Estudo (${window.appState.pomodoroSettings.study}m)`;
+        const btnModeBreak = document.getElementById("btn-mode-break");
+        if (btnModeBreak)
+          btnModeBreak.innerText = `Pausa (${window.appState.pomodoroSettings.break}m)`;
+      }
+
+      function toggleTimer() {
+        const icon = document.getElementById("timer-play-icon");
+        if (!icon) return;
+        const btn = icon.parentElement;
+        if (isTimerRunning) {
+          clearInterval(timerInterval);
+          icon.className = "ph-fill ph-play";
+          if (btn) btn.classList.remove("pulse-animation");
+          isTimerRunning = false;
+          updateTimerDisplay();
+        } else {
+          icon.className = "ph-fill ph-pause";
+          if (btn) btn.classList.add("pulse-animation");
+          isTimerRunning = true;
+          updateTimerDisplay();
+          timerInterval = setInterval(() => {
+            if (timeLeft > 0) {
+              timeLeft--;
+              updateTimerDisplay();
+            } else {
+              clearInterval(timerInterval);
+              isTimerRunning = false;
+              icon.className = "ph-fill ph-play";
+              if (btn) btn.classList.remove("pulse-animation");
+              updateTimerDisplay();
+              playAlarm();
+              if (currentMode === "study") {
+                window.appState.pomodorosToday++;
+                addLog("🍅 1 ciclo de foco concluído.");
+                saveData();
+                showToast("Pausa!", "success");
+                triggerConfetti();
+              } else {
+                showToast("De volta aos estudos!", "warning");
+              }
+            }
+          }, 1000);
+        }
+      }
+
+      function resetTimer() {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        const icon = document.getElementById("timer-play-icon");
+        if (icon) {
+          icon.className = "ph-fill ph-play";
+          if (icon.parentElement)
+            icon.parentElement.classList.remove("pulse-animation");
+        }
+        timeLeft =
+          currentMode === "study"
+            ? window.appState.pomodoroSettings.study * 60
+            : window.appState.pomodoroSettings.break * 60;
+        updateTimerDisplay();
+      }
+
+      function setTimerMode(m) {
+        currentMode = m;
+        const btnModeStudy = document.getElementById("btn-mode-study");
+        if (btnModeStudy)
+          btnModeStudy.classList.toggle("active", m === "study");
+        const btnModeBreak = document.getElementById("btn-mode-break");
+        if (btnModeBreak)
+          btnModeBreak.classList.toggle("active", m === "break");
+        resetTimer();
+      }
+
+      function autoSaveNotes() {
+        const notesEl = document.getElementById("tactical-notes");
+        if (notesEl) {
+          window.appState.notes = notesEl.value;
+          localStorage.setItem(
+            "prfDashboardState",
+            JSON.stringify(window.appState),
+          );
+          if (typeof window.saveToFirebase === "function")
+            window.saveToFirebase();
+        }
+      }
+      function manualSaveNotes() {
+        autoSaveNotes();
+        showToast("Notas salvas!", "success");
+      }
+
+      function addLog(m) {
+        const time = new Date().toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        window.appState.dailyLog.unshift({ time, message: m });
+        if (window.appState.dailyLog.length > 20)
+          window.appState.dailyLog.pop();
+        saveData();
+      }
+
+      function getUserRankInfo(perc) {
+        if (perc >= 100) return { name: "👮‍♂️ PRF Aprovado!", level: 7 };
+        if (perc >= 90) return { name: "🎖️ PRF Veterano", level: 6 };
+        if (perc >= 75) return { name: "🚔 Operacional", level: 5 };
+        if (perc >= 50) return { name: "🦅 Agente em Treino", level: 4 };
+        if (perc >= 25) return { name: "🥇 Cadete PRF", level: 3 };
+        if (perc >= 10) return { name: "🥈 Aluno Patrulheiro", level: 2 };
+        return { name: "🥉 Aspirante", level: 1 };
+      }
+
+      function updateSubject(id, change) {
+        const sub = window.appState.subjects.find((s) => s.id === id);
+        if (!sub) return;
+        let oldTotal = 0;
+        let oldWatched = 0;
+        window.appState.subjects.forEach((s) => {
+          oldTotal += s.total;
+          oldWatched += s.watched;
+        });
+        const oldRank = getUserRankInfo(
+          oldTotal === 0 ? 0 : (oldWatched / oldTotal) * 100,
+        );
+
+        let n = Math.max(0, Math.min(sub.watched + change, sub.total));
+        const diff = n - sub.watched;
+        if (diff === 0) return;
+        const wasComp = sub.watched === sub.total;
+        sub.watched = n;
+
+        if (diff > 0) addLog(`✔ +${diff} aula(s) de ${sub.name}.`);
+        else addLog(`✖ -${Math.abs(diff)} aula(s) de ${sub.name}.`);
+
+        const isoDate = new Date().toISOString().split("T")[0];
+        window.appState.weeklyData[isoDate] = Math.max(
+          0,
+          (window.appState.weeklyData[isoDate] || 0) + diff,
+        );
+
+        if (
+          diff > 0 &&
+          window.appState.dailyCount < window.appState.dailyGoal
+        ) {
+          window.appState.dailyCount = Math.min(
+            window.appState.dailyGoal,
+            window.appState.dailyCount + diff,
+          );
+          if (window.appState.dailyCount === window.appState.dailyGoal)
+            handleGoalMet();
+        } else if (diff < 0 && window.appState.dailyCount > 0) {
+          window.appState.dailyCount = Math.max(
+            0,
+            window.appState.dailyCount + diff,
+          );
+        }
+
+        if (sub.watched === sub.total && !wasComp && diff > 0) {
+          showToast(`Finalizou ${sub.name}! 📚`, "success");
+          addLog(`🏆 Edital de ${sub.name} fechado!`);
+          triggerConfetti();
+          const nextSub = window.appState.subjects.find(
+            (s) => !s.active && s.watched < s.total,
+          );
+          if (nextSub) {
+            nextSub.active = true;
+            setTimeout(
+              () => showToast(`${nextSub.name} no Núcleo Duro!`, "warning"),
+              1500,
+            );
+          }
+        }
+
+        let newWatched = oldWatched + diff;
+        const newRank = getUserRankInfo(
+          oldTotal === 0 ? 0 : (newWatched / oldTotal) * 100,
+        );
+
+        if (newRank.level > oldRank.level) {
+          setTimeout(() => {
+            showToast(`PROMOÇÃO! Você agora é ${newRank.name}! 🎖️`, "success");
+            addLog(`🎖️ Promovido a patente: ${newRank.name}!`);
+            triggerConfetti();
+            triggerConfetti();
+            const badge = document.getElementById("user-rank");
+            if (badge) {
+              badge.classList.add("rank-promote");
+              setTimeout(() => badge.classList.remove("rank-promote"), 1000);
+            }
+          }, 500);
+        }
+        saveData();
+      }
+
+      let progressChart;
+      let weeklyChart;
+      function initChart() {
+        const progressChartEl = document.getElementById("progressChart");
+        if (progressChartEl) {
+          progressChart = new Chart(progressChartEl.getContext("2d"), {
+            type: "doughnut",
+            data: {
+              labels: ["Concluído", "Pendente"],
+              datasets: [
+                {
+                  data: [0, 1],
+                  backgroundColor: ["#10b981", "#e2e8f0"],
+                  borderWidth: 0,
+                  cutout: "75%",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+            },
+          });
+        }
+        const weeklyChartEl = document.getElementById("weeklyChart");
+        if (weeklyChartEl) {
+          weeklyChart = new Chart(weeklyChartEl.getContext("2d"), {
+            type: "bar",
+            data: {
+              labels: [],
+              datasets: [
+                { data: [], backgroundColor: "#002855", borderRadius: 4 },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } },
+              },
+              plugins: { legend: { display: false } },
+            },
+          });
+        }
+      }
+
+      function updateWeeklyChart() {
+        if (!weeklyChart) return;
+        const labels = [];
+        const data = [];
+        const isDark = htmlDoc.getAttribute("data-theme") === "dark";
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const iso = d.toISOString().split("T")[0];
+          labels.push(
+            d
+              .toLocaleDateString("pt-BR", { weekday: "short" })
+              .replace(".", ""),
+          );
+          data.push(window.appState.weeklyData[iso] || 0);
+        }
+        weeklyChart.data.labels = labels;
+        weeklyChart.data.datasets[0].data = data;
+        weeklyChart.data.datasets[0].backgroundColor = isDark
+          ? "#3b82f6"
+          : "#002855";
+        weeklyChart.options.scales.x = {
+          ticks: { color: isDark ? "#94a3b8" : "#64748b" },
+          grid: { display: false },
+        };
+        weeklyChart.options.scales.y = {
+          ticks: { color: isDark ? "#94a3b8" : "#64748b", stepSize: 1 },
+          grid: { color: isDark ? "#334155" : "#e2e8f0" },
+        };
+        weeklyChart.update();
+      }
+
+      function updateChartData() {
+        if (!progressChart) return;
+        let total = 0;
+        let watched = 0;
+        window.appState.subjects.forEach((s) => {
+          total += s.total;
+          watched += s.watched;
+        });
+        const pend = total - watched;
+        const perc = total === 0 ? 0 : ((watched / total) * 100).toFixed(1);
+        progressChart.data.datasets[0].data = [watched, pend];
+        updateChartTheme();
+        const chartSubtitleEl = document.getElementById("chart-subtitle");
+        if (chartSubtitleEl)
+          chartSubtitleEl.innerHTML = `<span style="color: var(--primary-color)">${perc}%</span> do edital concluído`;
+        const rankInfo = getUserRankInfo(perc);
+        const userRankEl = document.getElementById("user-rank");
+        if (userRankEl) userRankEl.innerText = rankInfo.name;
+
+        const predictionTextEl = document.getElementById("prediction-text");
+        if (predictionTextEl) {
+          if (pend === 0) predictionTextEl.innerHTML = `🎉 Edital Finalizado!`;
+          else if (window.appState.dailyGoal > 0) {
+            const d = new Date();
+            d.setDate(
+              d.getDate() + Math.ceil(pend / window.appState.dailyGoal),
+            );
+            predictionTextEl.innerHTML = `🎯 Previsão: <strong style="color:var(--primary-color)">${d.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}</strong>`;
+          }
+        }
+        updateWeeklyChart();
+      }
+
+      function updateChartTheme() {
+        if (!progressChart) return;
+        progressChart.data.datasets[0].backgroundColor[1] =
+          htmlDoc.getAttribute("data-theme") === "dark" ? "#334155" : "#e2e8f0";
+        progressChart.update();
+      }
+
+      function renderDashboard() {
+        const streakCountEl = document.getElementById("streak-count");
+        if (streakCountEl) streakCountEl.innerText = window.appState.streak;
+        const streakBadgeEl = document.getElementById("streak-badge");
+        if (streakBadgeEl)
+          streakBadgeEl.style.display =
+            window.appState.streak > 0 ? "flex" : "none";
+        const aulasHojeEl = document.getElementById("aulas-hoje");
+        if (aulasHojeEl) aulasHojeEl.innerText = window.appState.dailyCount;
+        const metaTotalEl = document.getElementById("meta-total");
+        if (metaTotalEl)
+          metaTotalEl.innerText = `/${window.appState.dailyGoal}`;
+        const metaFillEl = document.getElementById("meta-fill");
+        if (metaFillEl)
+          metaFillEl.style.width = `${(window.appState.dailyCount / window.appState.dailyGoal) * 100}%`;
+
+        const btnEl = document.getElementById("btn-goal");
+        if (btnEl) {
+          if (window.appState.dailyCount >= window.appState.dailyGoal) {
+            btnEl.disabled = true;
+            btnEl.innerHTML = `<i class="ph-bold ph-check"></i> Missão Cumprida`;
+            btnEl.classList.add("success");
+          } else {
+            btnEl.disabled = false;
+            btnEl.innerHTML = `<i class="ph-bold ph-plus"></i> Registrar Aula`;
+            btnEl.classList.remove("success");
+          }
+        }
+
+        const pomodoroMarksEl = document.getElementById("pomodoro-marks");
+        if (pomodoroMarksEl)
+          pomodoroMarksEl.innerText = "🍅 ".repeat(
+            window.appState.pomodorosToday,
+          );
+        const tacticalNotesEl = document.getElementById("tactical-notes");
+        if (tacticalNotesEl && document.activeElement !== tacticalNotesEl)
+          tacticalNotesEl.value = window.appState.notes;
+
+        const logC = document.getElementById("daily-log-list");
+        if (logC) {
+          logC.innerHTML = "";
+          if (window.appState.dailyLog.length === 0)
+            logC.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px;">Aguardando início das missões...</div>`;
+          else
+            window.appState.dailyLog.forEach(
+              (l) =>
+                (logC.innerHTML += `<div class="log-item"><span class="log-time">${l.time}</span><span>${l.message}</span></div>`),
+            );
+        }
+
+        const activeC = document.getElementById("active-subjects");
+        const compC = document.getElementById("completed-subjects");
+        if (activeC) activeC.innerHTML = "";
+        if (compC) compC.innerHTML = "";
+        let hasComp = false;
+
+        window.appState.subjects.forEach((sub) => {
+          const p = ((sub.watched / sub.total) * 100).toFixed(1);
+          const isC = sub.watched === sub.total;
+          const html = `
+                <article class="subject-card ${isC ? "completed" : ""}">
+                    <div class="subject-title">
+                        ${sub.name} <i class="ph-bold ph-pencil-simple" style="cursor: pointer; color: var(--text-muted); font-size: 1rem;" onclick="editSubjectTotal(${sub.id})" title="Editar Total de Aulas"></i>
+                    </div>
+                    <div class="subject-stats"><span>Progresso</span><span style="font-weight: 600; color: var(--text-main)">${p}%</span></div>
+                    <div class="progress-track"><div class="progress-fill ${isC ? "completed" : ""}" style="width: ${p}%;"></div></div>
+                    <div class="subject-controls">
+                        <div class="stepper-badge">
+                            <button class="stepper-btn" onclick="updateSubject(${sub.id}, -1)" ${sub.watched === 0 ? "disabled" : ""}><i class="ph-bold ph-minus"></i></button>
+                            <div class="stepper-value">${sub.watched} / ${sub.total}</div>
+                            <button class="stepper-btn" onclick="updateSubject(${sub.id}, 1)" ${isC ? "disabled" : ""}><i class="ph-bold ph-plus"></i></button>
+                        </div>
+                    </div>
+                </article>`;
+          if (isC) {
+            hasComp = true;
+            if (compC) compC.innerHTML += html;
+          } else if (sub.active) {
+            if (activeC) activeC.innerHTML += html;
+          }
+        });
+
+        const completedHeaderEl = document.getElementById("completed-header");
+        if (completedHeaderEl)
+          completedHeaderEl.style.display = hasComp ? "flex" : "none";
+
+        const waitC = document.getElementById("waiting-subjects");
+        if (waitC) {
+          waitC.innerHTML = "";
+          window.appState.subjects
+            .filter((s) => !s.active && s.watched < s.total)
+            .forEach((sub, i) => {
+              waitC.innerHTML += `
+                        <div class="waiting-item" draggable="true" data-id="${sub.id}" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                            <div class="waiting-info">
+                                <div class="waiting-number desktop-drag-handle" title="Clique e arraste"><i class="ph-bold ph-dots-six-vertical"></i></div>
+                                <span style="font-weight: 500">${sub.name} <i class="ph-bold ph-pencil-simple" style="cursor: pointer; color: var(--text-muted); font-size: 0.9rem; margin-left: 5px;" onclick="editSubjectTotal(${sub.id})" title="Editar"></i></span>
+                                <span style="color: var(--text-muted); font-size: 0.9rem;">(${sub.total} aulas)</span>
+                            </div>
+                            <div class="status-badge desktop-drag-handle"><i class="ph-bold ph-arrows-out-line-vertical"></i> Arrastar</div>
+                            <div class="mobile-order-controls">
+                                <button class="mobile-order-btn" onclick="moveSubjectOrder(${sub.id}, -1)" title="Mover para cima"><i class="ph-bold ph-caret-up"></i></button>
+                                <button class="mobile-order-btn" onclick="moveSubjectOrder(${sub.id}, 1)" title="Mover para baixo"><i class="ph-bold ph-caret-down"></i></button>
+                            </div>
+                        </div>
+                    `;
+            });
+        }
+
+        if (progressChart) updateChartData();
+        updateTimerDisplay();
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (
+          e.target.tagName !== "INPUT" &&
+          e.target.tagName !== "TEXTAREA" &&
+          e.key.toLowerCase() === "p"
+        )
+          toggleTimer();
+      });
+
+      window.onload = () => {
+        initTheme();
+        initChart();
+        checkNewDay();
+        checkBackupReminder();
+        updateDailyQuote();
+        renderDashboard();
+      };
+    </script>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        signOut,
+        signInAnonymously,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB5lB87UYI-FC4HkCBVqGrkah48e6-hSGs",
+        authDomain: "prf-agente-administrativo.firebaseapp.com",
+        projectId: "prf-agente-administrativo",
+        storageBucket: "prf-agente-administrativo.firebasestorage.app",
+        messagingSenderId: "82397027291",
+        appId: "1:82397027291:web:f236c305127715c06465fe",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const APP_ID = "prf-agente-administrativo";
+
+      let currentUser = null;
+      let isSyncing = false;
+
+      function setConnectionStatus(status) {
+        const badge = document.getElementById("connection-status");
+        const statusText = document.getElementById("connection-text");
+        if (!badge || !statusText) return;
+
+        badge.classList.remove("online", "offline", "syncing", "local");
+        badge.classList.add(status);
+
+        if (status === "online") {
+          statusText.innerText = "Online";
+        } else if (status === "offline") {
+          statusText.innerText = "Offline";
+        } else if (status === "syncing") {
+          statusText.innerText = "Salvando...";
+        } else if (status === "local") {
+          statusText.innerText = "Modo Local";
+        }
+      }
+
+      window.addEventListener("online", () =>
+        setConnectionStatus(currentUser ? "online" : "offline"),
+      );
+      window.addEventListener("offline", () => setConnectionStatus("offline"));
+      setConnectionStatus(navigator.onLine ? "online" : "offline");
+
+      onAuthStateChanged(auth, async (user) => {
+        const userNameEl = document.getElementById("user-display-name");
+        const authStatusMsg = document.getElementById("auth-status-msg");
+        const btnLogout = document.getElementById("btn-logout");
+        const authFormArea = document.getElementById("auth-form-area");
+
+        if (user) {
+          currentUser = user;
+          setConnectionStatus(navigator.onLine ? "online" : "offline");
+
+          if (user.isAnonymous) {
+            if (userNameEl) userNameEl.innerText = "Anônimo";
+            if (authStatusMsg)
+              authStatusMsg.innerHTML =
+                "Atualmente você está como <strong>Anônimo</strong>. Faça login ou registe-se para salvar os dados permanentemente.";
+            if (btnLogout) btnLogout.style.display = "none";
+            if (authFormArea) authFormArea.style.display = "block";
+          } else {
+            if (userNameEl) userNameEl.innerText = user.email.split("@")[0];
+            if (authStatusMsg)
+              authStatusMsg.innerHTML = `Sessão iniciada como: <strong>${user.email}</strong>`;
+            if (btnLogout) btnLogout.style.display = "block";
+            if (authFormArea) authFormArea.style.display = "none";
+          }
+
+          const userRef = doc(
+            db,
+            "artifacts",
+            APP_ID,
+            "users",
+            user.uid,
+            "state",
+            "current",
+          );
+          onSnapshot(
+            userRef,
+            (snapshot) => {
+              if (snapshot.exists() && !isSyncing) {
+                const data = snapshot.data();
+                if (data && data.appState) {
+                  window.appState = data.appState;
+                  localStorage.setItem(
+                    "prfDashboardState",
+                    JSON.stringify(window.appState),
+                  );
+                  window.renderDashboard();
+                }
+              } else if (!snapshot.exists()) {
+                if (typeof window.saveToFirebase === "function") {
+                  window.saveToFirebase();
+                }
+              }
+            },
+            (error) => {
+              console.warn(
+                "Firebase Sync Error (Verifique as Regras do Firestore):",
+                error.message,
+              );
+              setConnectionStatus("local");
+              if (error.code === "permission-denied") {
+                if (typeof window.showToast === "function") {
+                  window.showToast(
+                    "Aviso: Falha de permissão no Firebase. Ajuste as Regras (Rules) no Firestore.",
+                    "danger",
+                  );
+                }
+              }
+            },
+          );
+        } else {
+          currentUser = null;
+          if (userNameEl) userNameEl.innerText = "Anônimo";
+          if (authStatusMsg)
+            authStatusMsg.innerHTML =
+              "Faça login para salvar permanentemente o seu progresso na nuvem.";
+          if (btnLogout) btnLogout.style.display = "none";
+          if (authFormArea) authFormArea.style.display = "block";
+
+          try {
+            await signInAnonymously(auth);
+          } catch (e) {
+            setConnectionStatus("local");
+            if (e.code === "auth/admin-restricted-operation") {
+              if (typeof window.showToast === "function") {
+                window.showToast(
+                  "Ative o 'Login Anônimo' no Firebase para guardar na nuvem.",
+                  "warning",
+                );
+              }
+            } else {
+              console.warn("Firebase Auth Error:", e.message);
+            }
+          }
+        }
+      });
+
+      window.saveToFirebase = async function () {
+        if (currentUser && navigator.onLine) {
+          isSyncing = true;
+          setConnectionStatus("syncing");
+          try {
+            const userRef = doc(
+              db,
+              "artifacts",
+              APP_ID,
+              "users",
+              currentUser.uid,
+              "state",
+              "current",
+            );
+            await setDoc(
+              userRef,
+              { appState: window.appState },
+              { merge: true },
+            );
+            setConnectionStatus("online");
+          } catch (e) {
+            console.warn("Erro ao sincronizar com Firebase:", e.message);
+            setConnectionStatus("local");
+          } finally {
+            isSyncing = false;
+          }
+        }
+      };
+
+      window.loginWithEmail = async () => {
+        const email = document.getElementById("auth-email").value;
+        const passEl = document.getElementById("auth-password");
+        const pass = passEl.value;
+        if (!email || !pass) {
+          if (typeof window.showToast === "function")
+            window.showToast("Preencha e-mail e senha.", "warning");
+          return;
+        }
+
+        setConnectionStatus("syncing");
+        try {
+          await signInWithEmailAndPassword(auth, email, pass);
+          passEl.value = "";
+          if (typeof window.closeAuthModal === "function")
+            window.closeAuthModal();
+          if (typeof window.showToast === "function")
+            window.showToast("Login efetuado com sucesso!", "success");
+        } catch (e) {
+          console.error("Erro no login:", e);
+          passEl.value = "";
+          if (typeof window.showToast === "function")
+            window.showToast(
+              "Erro ao entrar: Verifique as credenciais.",
+              "danger",
+            );
+          setConnectionStatus("offline");
+        }
+      };
+
+      window.registerWithEmail = async () => {
+        const email = document.getElementById("auth-email").value;
+        const passEl = document.getElementById("auth-password");
+        const pass = passEl.value;
+        if (!email || !pass) {
+          if (typeof window.showToast === "function")
+            window.showToast("Preencha e-mail e senha.", "warning");
+          return;
+        }
+
+        setConnectionStatus("syncing");
+        try {
+          const currentLocalState = window.appState;
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            pass,
+          );
+          passEl.value = "";
+
+          const userRef = doc(
+            db,
+            "artifacts",
+            APP_ID,
+            "users",
+            userCredential.user.uid,
+            "state",
+            "current",
+          );
+          await setDoc(
+            userRef,
+            { appState: currentLocalState },
+            { merge: true },
+          );
+
+          if (typeof window.closeAuthModal === "function")
+            window.closeAuthModal();
+          if (typeof window.showToast === "function")
+            window.showToast("Conta criada e dados migrados!", "success");
+        } catch (e) {
+          console.error("Erro ao registar:", e);
+          passEl.value = "";
+          if (typeof window.showToast === "function")
+            window.showToast(
+              "Erro ao criar conta. A senha deve ter 6+ carateres.",
+              "danger",
+            );
+          setConnectionStatus("offline");
+        }
+      };
+
+      window.logoutFirebase = async () => {
+        try {
+          await signOut(auth);
+          if (typeof window.closeAuthModal === "function")
+            window.closeAuthModal();
+          if (typeof window.showToast === "function")
+            window.showToast("Sessão terminada.", "success");
+        } catch (e) {
+          console.error("Erro ao sair:", e);
+        }
+      };
+    </script>
+  </body>
+</html>
