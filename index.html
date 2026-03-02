@@ -8,6 +8,7 @@
     />
     <title>Painel de Estudos | PRF Administrativo</title>
 
+    <!-- Cores da barra do navegador -->
     <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -108,7 +109,6 @@
           opacity 0.05s;
       }
 
-      /* Navbar */
       .navbar {
         background-color: var(--surface-color);
         padding: 1rem 2rem;
@@ -140,7 +140,6 @@
         gap: 1rem;
       }
 
-      /* Status de Conexão Firebase */
       .status-badge-top {
         display: flex;
         align-items: center;
@@ -178,6 +177,7 @@
       }
       .status-badge-top.offline .status-dot {
         background-color: var(--danger);
+        box-shadow: 0 0 6px var(--danger);
       }
       .status-badge-top.local {
         border-color: var(--accent-color);
@@ -186,6 +186,7 @@
       }
       .status-badge-top.local .status-dot {
         background-color: var(--accent-color);
+        box-shadow: 0 0 6px var(--accent-color);
       }
       .status-badge-top.syncing {
         border-color: var(--accent-color);
@@ -277,7 +278,6 @@
         align-items: flex-end;
       }
 
-      /* Container & Grids */
       .container {
         max-width: 1300px;
         margin: 2rem auto;
@@ -291,17 +291,11 @@
       }
       .tools-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 1.5rem;
         margin-bottom: 3rem;
       }
-      @media (max-width: 900px) {
-        .tools-grid {
-          grid-template-columns: 1fr;
-        }
-      }
 
-      /* Cards */
       .panel-card {
         background: var(--surface-color);
         padding: 1.8rem;
@@ -324,7 +318,6 @@
         color: var(--primary-color);
       }
 
-      /* Goals */
       .daily-goals {
         text-align: center;
         justify-content: center;
@@ -373,6 +366,26 @@
       }
       .btn-primary.success {
         background-color: var(--success);
+        color: white;
+      }
+      .btn-primary.success:disabled {
+        background-color: var(--success);
+        color: white;
+        opacity: 0.85;
+      }
+      .btn-primary.secondary {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+      }
+      .btn-primary.secondary:hover {
+        background-color: var(--border-color);
+      }
+      .btn-primary.danger {
+        background-color: var(--danger);
+      }
+      .btn-primary.danger:hover {
+        background-color: #dc2626;
       }
       .btn-edit-small {
         width: 28px;
@@ -394,7 +407,6 @@
         border-color: var(--accent-color);
       }
 
-      /* Charts & Predictions */
       .chart-container {
         position: relative;
         height: 160px;
@@ -413,7 +425,6 @@
         border: 1px dashed var(--border-color);
       }
 
-      /* Pomodoro */
       .timer-display {
         font-size: 4rem;
         font-weight: 800;
@@ -485,7 +496,6 @@
         text-align: center;
       }
 
-      /* Tools */
       .notepad-textarea {
         width: 100%;
         height: 150px;
@@ -540,7 +550,6 @@
         min-width: 45px;
       }
 
-      /* Subjects Grid */
       .section-header {
         margin: 2rem 0 1.5rem 0;
         display: flex;
@@ -672,7 +681,6 @@
         background: var(--bg-color);
       }
 
-      /* Waiting List & Drag Drop */
       .waiting-list {
         background: var(--surface-color);
         border-radius: var(--radius-lg);
@@ -734,7 +742,6 @@
         gap: 5px;
       }
 
-      /* Toasts, Modals, Animations */
       .toast-container {
         position: fixed;
         bottom: 20px;
@@ -887,6 +894,7 @@
         color: white;
         border-color: var(--danger);
       }
+
       .tactical-step {
         margin-bottom: 1.5rem;
         padding-bottom: 1.5rem;
@@ -943,7 +951,6 @@
         outline: none;
       }
 
-      /* --- RESPONSIVIDADE MOBILE / TABLET --- */
       @media (max-width: 650px) {
         .hide-mobile {
           display: none !important;
@@ -958,8 +965,6 @@
           font-size: 1.2rem;
           padding: 4px;
         }
-
-        /* Aumenta botões de toque para a regra dos 40px no mobile */
         .stepper-btn {
           width: 40px;
           height: 40px;
@@ -970,8 +975,6 @@
           height: 34px;
           font-size: 1.1rem;
         }
-
-        /* Ajustes Drag & Drop Mobile */
         .desktop-drag-handle {
           display: none !important;
         }
@@ -994,7 +997,6 @@
           color: white;
         }
       }
-
       @media (min-width: 651px) {
         .mobile-order-controls {
           display: none !important;
@@ -1003,6 +1005,7 @@
     </style>
   </head>
   <body>
+    <!-- Navegação Superior -->
     <header class="navbar">
       <div
         class="logo"
@@ -1284,6 +1287,7 @@
         </section>
       </div>
 
+      <!-- Tabela de Ferramentas / Questões -->
       <div class="tools-grid">
         <section class="panel-card" style="padding: 1.5rem">
           <div class="panel-title" style="justify-content: space-between">
@@ -1310,6 +1314,269 @@
             placeholder="Ex: Dir. Administrativo - Parei na aula 14 aos 25:00 min..."
             oninput="autoSaveNotes()"
           ></textarea>
+        </section>
+
+        <!-- Desempenho de Questões CEBRASPE -->
+        <section class="panel-card" style="padding: 1.5rem; text-align: center">
+          <div class="panel-title" style="justify-content: space-between">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <i class="ph-fill ph-list-checks"></i> Simulador CEBRASPE
+            </div>
+            <div
+              id="q-total-badge"
+              style="
+                font-size: 0.75rem;
+                background: var(--bg-color);
+                padding: 4px 10px;
+                border-radius: 12px;
+                border: 1px solid var(--border-color);
+                color: var(--text-muted);
+                font-weight: 700;
+                text-transform: uppercase;
+              "
+            >
+              Total: 0
+            </div>
+          </div>
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 10px;
+              margin-bottom: 1.5rem;
+              text-align: center;
+            "
+          >
+            <!-- Certas -->
+            <div
+              style="
+                background: rgba(16, 185, 129, 0.05);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+                border-radius: 12px;
+                padding: 10px;
+              "
+            >
+              <div
+                style="
+                  color: var(--success);
+                  font-weight: 800;
+                  font-size: 1.8rem;
+                  line-height: 1.2;
+                "
+                id="q-correct"
+              >
+                0
+              </div>
+              <div
+                style="
+                  font-size: 0.7rem;
+                  color: var(--success);
+                  margin-bottom: 8px;
+                  font-weight: 700;
+                  text-transform: uppercase;
+                "
+              >
+                Certas
+              </div>
+              <div style="display: flex; gap: 5px; justify-content: center">
+                <button
+                  class="btn-edit-small"
+                  onclick="addQuestion('correct', -1)"
+                >
+                  -
+                </button>
+                <button
+                  class="btn-edit-small"
+                  style="background: var(--success); color: white; border: none"
+                  onclick="addQuestion('correct', 1)"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <!-- Erradas -->
+            <div
+              style="
+                background: rgba(239, 68, 68, 0.05);
+                border: 1px solid rgba(239, 68, 68, 0.2);
+                border-radius: 12px;
+                padding: 10px;
+              "
+            >
+              <div
+                style="
+                  color: var(--danger);
+                  font-weight: 800;
+                  font-size: 1.8rem;
+                  line-height: 1.2;
+                "
+                id="q-wrong"
+              >
+                0
+              </div>
+              <div
+                style="
+                  font-size: 0.7rem;
+                  color: var(--danger);
+                  margin-bottom: 8px;
+                  font-weight: 700;
+                  text-transform: uppercase;
+                "
+              >
+                Erradas
+              </div>
+              <div style="display: flex; gap: 5px; justify-content: center">
+                <button
+                  class="btn-edit-small"
+                  onclick="addQuestion('wrong', -1)"
+                >
+                  -
+                </button>
+                <button
+                  class="btn-edit-small"
+                  style="background: var(--danger); color: white; border: none"
+                  onclick="addQuestion('wrong', 1)"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <!-- Em Branco -->
+            <div
+              style="
+                background: var(--bg-color);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 10px;
+              "
+            >
+              <div
+                style="
+                  color: var(--text-muted);
+                  font-weight: 800;
+                  font-size: 1.8rem;
+                  line-height: 1.2;
+                "
+                id="q-blank"
+              >
+                0
+              </div>
+              <div
+                style="
+                  font-size: 0.7rem;
+                  color: var(--text-muted);
+                  margin-bottom: 8px;
+                  font-weight: 700;
+                  text-transform: uppercase;
+                "
+              >
+                Branco
+              </div>
+              <div style="display: flex; gap: 5px; justify-content: center">
+                <button
+                  class="btn-edit-small"
+                  onclick="addQuestion('blank', -1)"
+                >
+                  -
+                </button>
+                <button
+                  class="btn-edit-small"
+                  style="
+                    background: var(--text-muted);
+                    color: white;
+                    border: none;
+                  "
+                  onclick="addQuestion('blank', 1)"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nota Líquida e Precisão -->
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              background: var(--bg-color);
+              padding: 12px 15px;
+              border-radius: 12px;
+              border: 1px solid var(--border-color);
+            "
+          >
+            <div>
+              <div
+                style="
+                  font-size: 0.75rem;
+                  color: var(--text-muted);
+                  font-weight: 700;
+                  text-transform: uppercase;
+                "
+              >
+                Nota Líquida
+              </div>
+              <div
+                id="q-liquida"
+                style="
+                  font-weight: 900;
+                  font-size: 1.8rem;
+                  color: var(--primary-color);
+                  line-height: 1.1;
+                "
+              >
+                0
+              </div>
+            </div>
+            <div style="text-align: right">
+              <div
+                style="
+                  font-size: 0.75rem;
+                  color: var(--text-muted);
+                  font-weight: 700;
+                  text-transform: uppercase;
+                "
+              >
+                Precisão
+              </div>
+              <div
+                id="q-accuracy"
+                style="
+                  font-weight: 900;
+                  font-size: 1.5rem;
+                  color: var(--text-main);
+                  line-height: 1.1;
+                "
+              >
+                0%
+              </div>
+            </div>
+          </div>
+
+          <!-- Barra de Precisão -->
+          <div
+            class="progress-track"
+            style="
+              margin-top: 10px;
+              height: 6px;
+              background: rgba(239, 68, 68, 0.15);
+              border-radius: 10px;
+              overflow: hidden;
+              display: flex;
+            "
+          >
+            <div
+              id="q-accuracy-bar"
+              style="
+                width: 0%;
+                background: var(--success);
+                height: 100%;
+                transition: width 0.5s ease;
+              "
+            ></div>
+          </div>
         </section>
 
         <section class="panel-card" style="padding: 1.5rem">
@@ -1612,6 +1879,7 @@
         pomodoroSettings: { study: 50, break: 10 },
         weeklyData: {},
         lastBackupReminder: null,
+        questions: { correct: 0, wrong: 0, blank: 0 },
         subjects: [
           {
             id: 1,
@@ -1696,6 +1964,10 @@
         window.appState.weeklyData = {};
       if (typeof window.appState.lastBackupReminder === "undefined")
         window.appState.lastBackupReminder = null;
+      if (typeof window.appState.questions === "undefined")
+        window.appState.questions = { correct: 0, wrong: 0, blank: 0 };
+      if (typeof window.appState.questions.blank === "undefined")
+        window.appState.questions.blank = 0;
 
       window.appState.subjects = window.appState.subjects.map((s) => {
         if (typeof s.id === "undefined")
@@ -1718,12 +1990,11 @@
       function resetData() {
         if (
           confirm(
-            "⚠️ Tem certeza de que deseja reiniciar todo o ciclo do zero? Isso apagará também os dados na nuvem.",
+            "⚠️ Tem certeza de que deseja reiniciar todo o ciclo do zero?",
           )
         ) {
-          window.appState = JSON.parse(JSON.stringify(defaultState));
-          saveData();
-          setTimeout(() => location.reload(), 500);
+          localStorage.removeItem("prfDashboardState");
+          location.reload();
         }
       }
 
@@ -1771,6 +2042,28 @@
           );
         }
       }
+
+      // --- CONTROLE DE QUESTÕES (Avançado) ---
+      function addQuestion(type, amount) {
+        if (type === "correct") {
+          window.appState.questions.correct = Math.max(
+            0,
+            window.appState.questions.correct + amount,
+          );
+        } else if (type === "wrong") {
+          window.appState.questions.wrong = Math.max(
+            0,
+            window.appState.questions.wrong + amount,
+          );
+        } else if (type === "blank") {
+          window.appState.questions.blank = Math.max(
+            0,
+            window.appState.questions.blank + amount,
+          );
+        }
+        saveData();
+      }
+      window.addQuestion = addQuestion;
 
       function openModal(id = "tactical-modal") {
         const modal = document.getElementById(id);
@@ -1984,6 +2277,7 @@
           window.appState.dailyCount = 0;
           window.appState.pomodorosToday = 0;
           window.appState.dailyLog = [];
+          window.appState.questions = { correct: 0, wrong: 0, blank: 0 };
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
           if (
@@ -2447,6 +2741,45 @@
         if (tacticalNotesEl && document.activeElement !== tacticalNotesEl)
           tacticalNotesEl.value = window.appState.notes;
 
+        const qCorrectEl = document.getElementById("q-correct");
+        const qWrongEl = document.getElementById("q-wrong");
+        const qBlankEl = document.getElementById("q-blank");
+        const qLiquidaEl = document.getElementById("q-liquida");
+        const qAccuracyEl = document.getElementById("q-accuracy");
+        const qAccuracyBar = document.getElementById("q-accuracy-bar");
+        const qTotalBadge = document.getElementById("q-total-badge");
+
+        if (qCorrectEl && qWrongEl && qLiquidaEl) {
+          const correct = window.appState.questions.correct || 0;
+          const wrong = window.appState.questions.wrong || 0;
+          const blank = window.appState.questions.blank || 0;
+
+          const totalRespondidas = correct + wrong;
+          const totalGeral = correct + wrong + blank;
+
+          const liquida = correct - wrong;
+          const accuracy =
+            totalRespondidas > 0
+              ? ((correct / totalRespondidas) * 100).toFixed(1)
+              : 0;
+
+          qCorrectEl.innerText = correct;
+          qWrongEl.innerText = wrong;
+          if (qBlankEl) qBlankEl.innerText = blank;
+          if (qTotalBadge) qTotalBadge.innerText = `Total: ${totalGeral}`;
+
+          qLiquidaEl.innerText = liquida;
+          qLiquidaEl.style.color =
+            liquida > 0
+              ? "var(--success)"
+              : liquida < 0
+                ? "var(--danger)"
+                : "var(--text-main)";
+
+          if (qAccuracyEl) qAccuracyEl.innerText = `${accuracy}%`;
+          if (qAccuracyBar) qAccuracyBar.style.width = `${accuracy}%`;
+        }
+
         const logC = document.getElementById("daily-log-list");
         if (logC) {
           logC.innerHTML = "";
@@ -2546,10 +2879,10 @@
       import {
         getAuth,
         onAuthStateChanged,
+        signInAnonymously,
         signInWithEmailAndPassword,
         createUserWithEmailAndPassword,
         signOut,
-        signInAnonymously,
       } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
       import {
         getFirestore,
@@ -2574,14 +2907,16 @@
 
       let currentUser = null;
       let isSyncing = false;
+      let isAuthInitialized = false;
 
       function setConnectionStatus(status) {
-        const badge = document.getElementById("connection-status");
+        const statusBadge = document.getElementById("connection-status");
         const statusText = document.getElementById("connection-text");
-        if (!badge || !statusText) return;
+        if (!statusBadge || !statusText) return;
 
-        badge.classList.remove("online", "offline", "syncing", "local");
-        badge.classList.add(status);
+        // Limpa os estados anteriores e aplica o novo para o CSS assumir as cores
+        statusBadge.classList.remove("online", "offline", "syncing", "local");
+        statusBadge.classList.add(status);
 
         if (status === "online") {
           statusText.innerText = "Online";
@@ -2607,6 +2942,7 @@
         const authFormArea = document.getElementById("auth-form-area");
 
         if (user) {
+          isAuthInitialized = true;
           currentUser = user;
           setConnectionStatus(navigator.onLine ? "online" : "offline");
 
@@ -2625,73 +2961,78 @@
             if (authFormArea) authFormArea.style.display = "none";
           }
 
-          const userRef = doc(
-            db,
-            "artifacts",
-            APP_ID,
-            "users",
-            user.uid,
-            "state",
-            "current",
-          );
-          onSnapshot(
-            userRef,
-            (snapshot) => {
-              if (snapshot.exists() && !isSyncing) {
-                const data = snapshot.data();
-                if (data && data.appState) {
-                  window.appState = data.appState;
-                  localStorage.setItem(
-                    "prfDashboardState",
-                    JSON.stringify(window.appState),
-                  );
-                  window.renderDashboard();
+          try {
+            const userRef = doc(
+              db,
+              "artifacts",
+              APP_ID,
+              "users",
+              user.uid,
+              "state",
+              "current",
+            );
+            onSnapshot(
+              userRef,
+              (snapshot) => {
+                if (snapshot.exists() && !isSyncing) {
+                  const data = snapshot.data();
+                  if (data && data.appState) {
+                    window.appState = data.appState;
+                    localStorage.setItem(
+                      "prfDashboardState",
+                      JSON.stringify(window.appState),
+                    );
+                    window.renderDashboard();
+                  }
                 }
-              } else if (!snapshot.exists()) {
-                if (typeof window.saveToFirebase === "function") {
-                  window.saveToFirebase();
+              },
+              (error) => {
+                console.warn("Firestore Sync Error:", error);
+                setConnectionStatus("local");
+                if (error.code === "permission-denied") {
+                  if (typeof window.showToast === "function")
+                    window.showToast(
+                      "Erro de permissão no Firestore. Verifique as regras da base de dados.",
+                      "danger",
+                    );
                 }
-              }
-            },
-            (error) => {
-              console.warn(
-                "Firebase Sync Error (Verifique as Regras do Firestore):",
-                error.message,
-              );
-              setConnectionStatus("local");
-              if (error.code === "permission-denied") {
-                if (typeof window.showToast === "function") {
-                  window.showToast(
-                    "Aviso: Falha de permissão no Firebase. Ajuste as Regras (Rules) no Firestore.",
-                    "danger",
-                  );
-                }
-              }
-            },
-          );
+              },
+            );
+          } catch (e) {
+            console.error(e);
+          }
         } else {
           currentUser = null;
-          if (userNameEl) userNameEl.innerText = "Anônimo";
-          if (authStatusMsg)
-            authStatusMsg.innerHTML =
-              "Faça login para salvar permanentemente o seu progresso na nuvem.";
-          if (btnLogout) btnLogout.style.display = "none";
-          if (authFormArea) authFormArea.style.display = "block";
 
-          try {
-            await signInAnonymously(auth);
-          } catch (e) {
-            setConnectionStatus("local");
-            if (e.code === "auth/admin-restricted-operation") {
-              if (typeof window.showToast === "function") {
-                window.showToast(
-                  "Ative o 'Login Anônimo' no Firebase para guardar na nuvem.",
-                  "warning",
+          if (!isAuthInitialized) {
+            try {
+              await signInAnonymously(auth);
+            } catch (e) {
+              isAuthInitialized = true;
+              setConnectionStatus("local");
+              if (e.code === "auth/admin-restricted-operation") {
+                console.warn(
+                  "Firebase Auth Error: Login anónimo não ativado. Modo local ativado.",
                 );
               }
-            } else {
-              console.warn("Firebase Auth Error:", e.message);
+              if (userNameEl) userNameEl.innerText = "Offline";
+              if (authStatusMsg)
+                authStatusMsg.innerHTML = "Autenticação falhou. Modo local.";
+              if (btnLogout) btnLogout.style.display = "none";
+              if (authFormArea) authFormArea.style.display = "block";
             }
+          } else {
+            if (userNameEl) userNameEl.innerText = "Deslogado";
+            if (authStatusMsg)
+              authStatusMsg.innerHTML =
+                "Faça login para salvar permanentemente o seu progresso na nuvem.";
+            if (btnLogout) btnLogout.style.display = "none";
+            if (authFormArea) authFormArea.style.display = "block";
+            setConnectionStatus("local");
+
+            try {
+              await signInAnonymously(auth);
+            } catch (err) {} // Tenta restaurar a sessão anónima automaticamente após logout
           }
         }
       });
@@ -2719,6 +3060,15 @@
           } catch (e) {
             console.warn("Erro ao sincronizar com Firebase:", e.message);
             setConnectionStatus("local");
+            if (
+              e.code === "permission-denied" &&
+              typeof window.showToast === "function"
+            ) {
+              window.showToast(
+                "Permissão Negada! Verifique as regras do Firestore.",
+                "danger",
+              );
+            }
           } finally {
             isSyncing = false;
           }
@@ -2746,11 +3096,11 @@
         } catch (e) {
           console.error("Erro no login:", e);
           passEl.value = "";
+          let msg = "Erro ao entrar. Verifique os seus dados.";
+          if (e.code === "auth/invalid-credential")
+            msg = "E-mail ou senha incorretos.";
           if (typeof window.showToast === "function")
-            window.showToast(
-              "Erro ao entrar: Verifique as credenciais.",
-              "danger",
-            );
+            window.showToast(msg, "danger");
           setConnectionStatus("offline");
         }
       };
@@ -2797,11 +3147,13 @@
         } catch (e) {
           console.error("Erro ao registar:", e);
           passEl.value = "";
+          let msg = "Erro ao criar conta.";
+          if (e.code === "auth/email-already-in-use")
+            msg = "Este e-mail já está em uso.";
+          else if (e.code === "auth/weak-password")
+            msg = "A senha deve ter pelo menos 6 caracteres.";
           if (typeof window.showToast === "function")
-            window.showToast(
-              "Erro ao criar conta. A senha deve ter 6+ carateres.",
-              "danger",
-            );
+            window.showToast(msg, "danger");
           setConnectionStatus("offline");
         }
       };
