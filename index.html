@@ -1127,9 +1127,16 @@
         top: -2px;
       }
 
+      .show-mobile {
+        display: none !important;
+      }
+
       @media (max-width: 650px) {
         .hide-mobile {
           display: none !important;
+        }
+        .show-mobile {
+          display: flex !important;
         }
         .navbar {
           padding: 1rem 0.8rem;
@@ -1428,6 +1435,16 @@
             title="Alternar Modo Escuro"
           >
             <i class="ph ph-moon" id="theme-icon"></i>
+          </button>
+
+          <!-- Botão de Sair visível apenas no Mobile -->
+          <button
+            class="action-icon-btn danger show-mobile"
+            onclick="confirmLogout()"
+            aria-label="Sair da Conta"
+            title="Sair da Conta"
+          >
+            <i class="ph ph-sign-out"></i>
           </button>
 
           <div class="header-user-area hide-mobile">
