@@ -13,7 +13,13 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-    <link id="favicon" rel="icon" type="image/webp" href="logo.webp" />
+    <link
+      id="favicon"
+      rel="icon"
+      type="image/webp"
+      href="logo.webp"
+      sizes="16x16 32x32 48x48 64x64"
+    />
     <link id="apple-icon" rel="apple-touch-icon" href="logo.webp" />
 
     <link
@@ -1191,7 +1197,11 @@
     <!-- ECRÃ DE SPLASH (Carregamento Inicial Otimizado) -->
     <div id="splash-screen">
       <div class="login-logo">
-        <img src="logo.webp" alt="PRF Logo" style="width: 60px; height: 60px" />
+        <img
+          src="logo.webp"
+          alt="PRF Logo"
+          style="width: 90px; height: 90px; object-fit: contain"
+        />
       </div>
       <div style="color: var(--text-muted); font-weight: 600; margin-top: 10px">
         Carregando Comando Central...
@@ -1207,8 +1217,9 @@
             src="logo.webp"
             alt="PRF Logo"
             style="
-              width: 70px;
-              height: 70px;
+              width: 100px;
+              height: 100px;
+              object-fit: contain;
               filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
             "
           />
@@ -1321,21 +1332,22 @@
           onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
           title="Voltar ao topo"
         >
-          <i
-            class="ph-fill ph-shield-check"
-            style="filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2))"
-          ></i>
+          <img
+            src="logo.webp"
+            alt="PRF Logo"
+            style="width: 46px; height: 46px; object-fit: contain"
+          />
           <span
             class="hide-mobile"
             style="display: flex; align-items: center; gap: 10px"
           >
-            <span style="font-weight: 900; letter-spacing: 1px">PRF</span>
             <span
               style="
                 width: 5px;
                 height: 5px;
                 background-color: var(--accent-color);
                 border-radius: 50%;
+                margin-left: 5px;
               "
             ></span>
             <span
