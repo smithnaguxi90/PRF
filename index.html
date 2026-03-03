@@ -810,6 +810,34 @@
         color: var(--primary-hover);
       }
 
+      /* Novos Estilos para Citações e Leis (Markdown) */
+      .chat-ai pre {
+        background: rgba(0, 40, 85, 0.05);
+        padding: 10px;
+        border-radius: 8px;
+        border-left: 3px solid var(--accent-color);
+        overflow-x: auto;
+        margin-bottom: 10px;
+        font-family: monospace;
+        font-size: 0.85rem;
+      }
+      [data-theme="dark"] .chat-ai pre {
+        background: rgba(59, 130, 246, 0.1);
+        border-left-color: var(--primary-hover);
+      }
+      .chat-ai code {
+        background: rgba(0, 0, 0, 0.05);
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: var(--danger);
+      }
+      [data-theme="dark"] .chat-ai code {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fca5a5;
+      }
+
       .typing-indicator {
         display: flex;
         gap: 4px;
@@ -840,6 +868,14 @@
         100% {
           opacity: 0.2;
         }
+      }
+
+      /* Nova animação de carregamento visual para botões */
+      .btn-saving {
+        animation: pulse 0.5s ease-in-out;
+        background-color: var(--success) !important;
+        color: white !important;
+        border-color: var(--success) !important;
       }
 
       /* Botões de Ação Rápida IA */
@@ -1285,6 +1321,7 @@
         display: none !important;
       }
 
+      /* Melhoria de Acessibilidade Tátil (Touch Targets) no Mobile */
       @media (max-width: 650px) {
         .hide-mobile {
           display: none !important;
@@ -1303,15 +1340,19 @@
           padding: 4px;
         }
         .stepper-btn {
+          width: 44px;
+          height: 44px;
+          font-size: 1.3rem;
+        } /* Aumentado Touch Target */
+        .btn-edit-small {
           width: 40px;
           height: 40px;
           font-size: 1.2rem;
-        }
-        .btn-edit-small {
-          width: 34px;
-          height: 34px;
-          font-size: 1.1rem;
-        }
+        } /* Aumentado Touch Target */
+        .ai-quick-btn {
+          padding: 10px 16px;
+          font-size: 0.9rem;
+        } /* Aumentado para facilitar clique na IA */
         .desktop-drag-handle {
           display: none !important;
         }
@@ -1324,11 +1365,15 @@
           background: var(--bg-color);
           border: 1px solid var(--border-color);
           border-radius: 4px;
-          padding: 4px 8px;
+          padding: 8px 12px;
           color: var(--text-muted);
-          font-size: 0.9rem;
+          font-size: 1rem;
           cursor: pointer;
-        }
+          min-height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        } /* Aumentado Touch Target */
         .mobile-order-btn:active {
           background: var(--primary-color);
           color: white;
@@ -1399,6 +1444,7 @@
           onkeydown="
             if (event.key === 'Enter') {
               event.preventDefault();
+              this.blur();
               window.loginWithEmail();
             }
           "
@@ -1411,6 +1457,7 @@
           onkeydown="
             if (event.key === 'Enter') {
               event.preventDefault();
+              this.blur();
               window.loginWithEmail();
             }
           "
@@ -2167,16 +2214,40 @@
               </div>
             </div>
 
-            <div style="display: flex; gap: 8px; margin-top: 10px">
+            <!-- Input Redesenhado -->
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                margin-top: 10px;
+                background: var(--bg-color);
+                padding: 6px;
+                border-radius: 30px;
+                border: 1px solid var(--border-color);
+                align-items: center;
+                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+              "
+            >
+              <div style="padding-left: 10px; color: var(--text-muted)">
+                <i class="ph-bold ph-chat-teardrop-text"></i>
+              </div>
               <input
                 type="text"
                 id="ai-input"
-                class="auth-input"
-                style="margin-bottom: 0; flex: 1"
-                placeholder="Pergunte sobre leis, resumos ou peça uma questão..."
+                style="
+                  flex: 1;
+                  border: none;
+                  background: transparent;
+                  padding: 10px;
+                  color: var(--text-main);
+                  font-size: 0.95rem;
+                  outline: none;
+                "
+                placeholder="Qual a tua dúvida tática, Guerreiro?"
                 onkeydown="
                   if (event.key === 'Enter') {
                     event.preventDefault();
+                    this.blur();
                     askAI();
                   }
                 "
@@ -2184,7 +2255,16 @@
               <button
                 id="ai-btn"
                 class="btn-primary"
-                style="margin-top: 0; width: auto; padding: 0 1.2rem"
+                style="
+                  margin-top: 0;
+                  width: 40px;
+                  height: 40px;
+                  padding: 0;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                "
                 onclick="askAI()"
                 title="Enviar pergunta"
               >
@@ -2595,11 +2675,14 @@
       function addSubject() {
         const name = prompt("Nome da nova disciplina:");
         if (!name || name.trim() === "") return;
-        const total = parseInt(
-          prompt(`Número total de videoaulas para ${name}:`),
-        );
+        const input = prompt(`Número total de videoaulas para ${name}:`);
+        if (!input || !/^\d+$/.test(input.trim())) {
+          showToast("Por favor, introduza apenas números válidos.", "warning");
+          return;
+        }
+        const total = parseInt(input.trim());
         if (isNaN(total) || total <= 0) {
-          showToast("Total de aulas inválido.", "danger");
+          showToast("O total de aulas deve ser maior que zero.", "warning");
           return;
         }
         const newId =
@@ -2624,14 +2707,23 @@
           `Editar total de aulas de "${sub.name}":`,
           sub.total,
         );
-        const newTotal = parseInt(input);
-        if (!isNaN(newTotal) && newTotal >= sub.watched) {
+        if (input === null) return;
+        if (!/^\d+$/.test(input.trim())) {
+          showToast("Por favor, introduza apenas números válidos.", "warning");
+          return;
+        }
+        const newTotal = parseInt(input.trim());
+        if (isNaN(newTotal) || newTotal <= 0) {
+          showToast("O total deve ser um número maior que zero.", "warning");
+          return;
+        }
+        if (newTotal >= sub.watched) {
           sub.total = newTotal;
           saveData();
           showToast("Total atualizado!", "success");
-        } else if (newTotal < sub.watched) {
+        } else {
           showToast(
-            "Erro: O novo total é menor do que as aulas já assistidas.",
+            `Erro: O novo total não pode ser menor que as aulas já assistidas (${sub.watched}).`,
             "danger",
           );
         }
@@ -2972,6 +3064,11 @@
       }
 
       function addDailyGoal() {
+        const btn = document.getElementById("btn-goal");
+        if (btn && !btn.disabled) {
+          btn.classList.add("pulse-animation");
+          setTimeout(() => btn.classList.remove("pulse-animation"), 600);
+        }
         if (window.appState.dailyCount < window.appState.dailyGoal) {
           window.appState.dailyCount++;
           addLog("🎯 Registrou aula na Meta Diária (avulso).");
@@ -2989,11 +3086,18 @@
           "Sua nova meta diária:",
           window.appState.dailyGoal,
         );
-        const newG = parseInt(input);
+        if (input === null) return;
+        if (!/^\d+$/.test(input.trim())) {
+          showToast("Por favor, introduza apenas números válidos.", "warning");
+          return;
+        }
+        const newG = parseInt(input.trim());
         if (!isNaN(newG) && newG > 0) {
           window.appState.dailyGoal = newG;
           saveData();
           showToast("Meta atualizada!", "success");
+        } else {
+          showToast("A meta diária deve ser maior que zero.", "warning");
         }
       }
 
@@ -3169,7 +3273,19 @@
       }
       function manualSaveNotes() {
         autoSaveNotes();
-        showToast("Notas salvas!", "success");
+        const btn = document.querySelector(
+          'button[onclick="manualSaveNotes()"]',
+        );
+        if (btn) {
+          const originalHtml = btn.innerHTML;
+          btn.innerHTML = `<i class="ph-bold ph-check"></i> Salvo`;
+          btn.classList.add("btn-saving");
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.classList.remove("btn-saving");
+          }, 1500);
+        }
+        showToast("Notas salvas com sucesso!", "success");
       }
 
       function addLog(m) {
@@ -3576,6 +3692,7 @@
 
       // --- INTEGRAÇÃO DA INTELIGÊNCIA ARTIFICIAL (GEMINI API) AVANÇADA ---
       let aiChatHistory = [];
+      let isAILoading = false; // Controle de estado para evitar cliques múltiplos
 
       function clearChat() {
         aiChatHistory = [];
@@ -3599,7 +3716,32 @@
         }
       }
 
+      // Função para garantir que o scroll desce suavemente
+      function scrollToBottom(elementId) {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.scrollTo({
+            top: el.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      }
+
+      // Observador para auto-scroll inteligente do Chat
+      function setupChatObserver() {
+        const chatContainer = document.getElementById("chat-container");
+        if (chatContainer) {
+          const observer = new MutationObserver(() => {
+            scrollToBottom("chat-container");
+          });
+          observer.observe(chatContainer, { childList: true, subtree: true });
+        }
+      }
+
       async function askAI() {
+        // Proteção contra cliques múltiplos
+        if (isAILoading) return;
+
         const inputEl = document.getElementById("ai-input");
         const chatContainer = document.getElementById("chat-container");
         const btnEl = document.getElementById("ai-btn");
@@ -3610,13 +3752,22 @@
           return;
         }
 
+        isAILoading = true;
+
+        // Limpeza Preventiva do Histórico (mantém as últimas 10 interações - 5 pares pergunta/resposta) para evitar erro de limite de tokens da API
+        if (aiChatHistory.length > 10) {
+          // Remove os elementos mais antigos, garantindo que remove pares de {role: user}, {role: model}
+          aiChatHistory.splice(0, 2);
+        }
+
         // 1. Adiciona a mensagem do Utilizador ao Ecrã
         chatContainer.innerHTML += `<div class="chat-bubble chat-user">${query}</div>`;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        scrollToBottom("chat-container");
 
         inputEl.value = "";
         inputEl.disabled = true;
         btnEl.disabled = true;
+        btnEl.style.opacity = "0.5";
 
         // Adiciona Animação de Digitação (Typing Indicator)
         const typingId = "typing-" + Date.now();
@@ -3626,36 +3777,63 @@
                       <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
                   </div>
               </div>`;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        scrollToBottom("chat-container");
 
-        // A API Key é fornecida automaticamente neste ambiente
-        const apiKey = "";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        // A API Key inserida para funcionar externamente (Vercel, etc.)
+        const apiKey = "AIzaSyDJDJzn5kGQ2tnQErziK_OS5YFKUVWtU8o";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-        // Extrai o contexto em tempo real do aluno para a IA ser mais inteligente
+        // 2. Extrai o contexto COMPLETO do edital para a IA
         const activeSubjects =
           window.appState.subjects
             .filter((s) => s.active)
             .map((s) => s.name)
             .join(", ") || "Nenhuma";
+        const allSubjectsProgress = window.appState.subjects
+          .map((s) => {
+            const perc = ((s.watched / s.total) * 100).toFixed(1);
+            return `- ${s.name}: ${perc}% concluído (${s.watched}/${s.total})`;
+          })
+          .join("\n             ");
+
+        const userNotes = window.appState.notes
+          ? window.appState.notes
+          : "O aluno não tem anotações recentes.";
+
         const progressContext = `
-             Dados Atuais do Aluno:
+             === CONTEXTO TÁTICO DO ALUNO ===
              - Meta Diária: ${window.appState.dailyCount} de ${window.appState.dailyGoal} aulas concluídas hoje.
              - Dias Seguidos (Streak): ${window.appState.streak} dias.
-             - Disciplinas Ativas no Núcleo Duro: ${activeSubjects}.
-             - Desempenho CEBRASPE: ${window.appState.questions.correct} Certas, ${window.appState.questions.wrong} Erradas.
+             - Desempenho CEBRASPE: ${window.appState.questions.correct} Certas, ${window.appState.questions.wrong} Erradas, ${window.appState.questions.blank} Em Branco. (Nota Líquida: ${window.appState.questions.correct - window.appState.questions.wrong}).
+             - Bloco de Notas Atual: "${userNotes}"
+             
+             - Progresso Detalhado do Edital:
+             ${allSubjectsProgress}
+             ================================
           `;
 
         // Prepara o Payload mantendo o histórico de conversação
         const currentMessage = { role: "user", parts: [{ text: query }] };
         const payloadContents = [...aiChatHistory, currentMessage];
 
+        // 1. Instruções de Sistema Mais Rigorosas
         const payload = {
           contents: payloadContents,
           systemInstruction: {
             parts: [
               {
-                text: `Aja como um Mentor Tático de elite especializado no concurso da PRF. Você tem acesso aos dados de progresso do aluno. \n\n${progressContext}\n\nRegras: 1) Responda de forma objetiva, didática e focada em bancas de concurso (como CEBRASPE). 2) Use formatação Markdown (negrito, listas). 3) NUNCA use listas de tarefas interativas (checklists como '- [ ]'). Use apenas marcadores padrão. 4) Mantenha um tom profissional, respeitoso e de incentivo militar ('Guerreiro', 'Foco na missão'). 5) Se o aluno pedir análise do seu progresso, use os 'Dados Atuais do Aluno' para motivá-lo ou dar um choque de realidade de forma construtiva. 6) Não invente leis.`,
+                text: `Assuma a identidade de um Mentor Tático de Elite para o concurso da Polícia Rodoviária Federal (PRF) do Brasil. Você é rigoroso, direto e focado na aprovação.
+              
+              Você tem acesso ao painel de controlo do aluno. Leia o contexto abaixo antes de responder:
+              ${progressContext}
+              
+              Regras de Engajamento:
+              1. Respostas Diretas e Didáticas: Seja cirúrgico. Foque no estilo da banca CEBRASPE (Certo/Errado).
+              2. Formatação Profissional: Use Markdown impecável. Utilize negrito para destacar prazos, palavras-chave e exceções à regra. Se citar artigos de lei longos, coloque-os num bloco de código ou citação (quote). NUNCA use checklists interativos ("- [ ]"). Use apenas marcadores padrão ("- " ou "* ").
+              3. Tom de Voz Militar: Mantenha uma postura profissional, de incentivo militar e alta disciplina ("Guerreiro", "Futuro PRF", "Foco na missão"). Evite ser excessivamente amigável; seja um treinador exigente.
+              4. Proatividade Tática: No final de explicações complexas, sugira um "Próximo Passo" ou faça uma pergunta curta (estilo CEBRASPE) para testar o conhecimento.
+              5. Visão Estratégica (Consciência Situacional): Se o aluno pedir conselhos de estudo ou análise, leia a secção "Progresso Detalhado do Edital" e as estatísticas diárias para dar conselhos precisos sobre qual matéria ele deve priorizar amanhã ou alertar se alguma matéria está muito atrasada.
+              6. Precisão Jurídica: NUNCA invente leis, súmulas ou jurisprudência. Baseie-se APENAS na doutrina dominante e na legislação vigente no Brasil aplicável à PRF.`,
               },
             ],
           },
@@ -3685,7 +3863,7 @@
 
           const textResponse =
             result.candidates?.[0]?.content?.parts?.[0]?.text ||
-            "Ocorreu um erro na elaboração da resposta tática.";
+            "Ocorreu um erro de transmissão. Repita a operação.";
 
           // Guarda a conversa no histórico para a próxima pergunta
           aiChatHistory.push(currentMessage);
@@ -3701,18 +3879,28 @@
           // Renderiza a resposta da IA convertendo Markdown para HTML via biblioteca Marked.js
           const formattedHTML = marked.parse(textResponse);
           chatContainer.innerHTML += `<div class="chat-bubble chat-ai">${formattedHTML}</div>`;
-          chatContainer.scrollTop = chatContainer.scrollHeight;
+          // O scroll desce automaticamente graças ao MutationObserver
         } catch (error) {
           console.error("Erro na IA:", error);
           const typingEl = document.getElementById(typingId);
           if (typingEl) typingEl.remove();
 
-          chatContainer.innerHTML += `<div class="chat-bubble chat-ai"><span style="color: var(--danger)"><i class="ph-bold ph-warning-circle"></i> Erro de comunicação com o Comando Central da IA. Tenta novamente.</span></div>`;
+          let errorMsg =
+            "O servidor está ocupado. Tente novamente em instantes.";
+          if (!navigator.onLine) {
+            errorMsg = "Verifique a sua ligação à Internet e tente novamente.";
+          } else if (error.message && error.message.includes("404")) {
+            errorMsg =
+              "Serviço não encontrado (Erro 404). Verifique a configuração da sua API.";
+          }
+
+          chatContainer.innerHTML += `<div class="chat-bubble chat-ai"><span style="color: var(--danger)"><i class="ph-bold ph-warning-circle"></i> ${errorMsg}</span></div>`;
           showToast("Falha na ligação à IA.", "danger");
-          chatContainer.scrollTop = chatContainer.scrollHeight;
         } finally {
+          isAILoading = false;
           inputEl.disabled = false;
           btnEl.disabled = false;
+          btnEl.style.opacity = "1";
           inputEl.focus();
         }
       }
@@ -3724,6 +3912,7 @@
         checkBackupReminder();
         updateDailyQuote();
         renderDashboard();
+        setupChatObserver();
       };
     </script>
 
@@ -3772,8 +3961,18 @@
       });
 
       let currentUser = null;
-      let isSyncing = false;
+      let isSyncing = (window.isSyncing = false); // Exposta globalmente para ser lida no window.onbeforeunload
       let debounceTimer = null;
+
+      // Listener Global para impedir saída durante sincronização com o Firebase
+      window.addEventListener("beforeunload", (e) => {
+        if (window.isSyncing) {
+          // A maioria dos browsers modernos mostra a sua própria mensagem genérica
+          e.preventDefault();
+          e.returnValue = "";
+          return "";
+        }
+      });
 
       function setConnectionStatus(status) {
         const statusBadge = document.getElementById("connection-status");
@@ -3848,7 +4047,7 @@
                 onSnapshot(
                   userRef,
                   (snapshot) => {
-                    if (snapshot.exists() && !isSyncing) {
+                    if (snapshot.exists() && !window.isSyncing) {
                       const data = snapshot.data();
                       if (data && data.appState) {
                         window.appState = ensureValidState(data.appState);
@@ -3889,7 +4088,7 @@
           if (debounceTimer) clearTimeout(debounceTimer);
 
           debounceTimer = setTimeout(async () => {
-            isSyncing = true;
+            window.isSyncing = true; // Exposto na window para ser lido no beforeunload
             try {
               const userRef = doc(
                 db,
@@ -3910,7 +4109,7 @@
               console.warn("Erro ao sincronizar com Firebase:", e.message);
               setConnectionStatus("local");
             } finally {
-              isSyncing = false;
+              window.isSyncing = false;
             }
           }, 1500);
         }
