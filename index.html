@@ -13,17 +13,8 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-    <link
-      id="favicon"
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5 L10 25 L10 60 C10 85 50 95 50 95 C50 95 90 85 90 60 L90 25 Z' fill='%23002855' stroke='%23eab308' stroke-width='5'/%3E%3Ctext x='50' y='58' font-family='sans-serif' font-size='32' font-weight='bold' fill='%23eab308' text-anchor='middle' dominant-baseline='middle'%3EPRF%3C/text%3E%3C/svg%3E"
-    />
-    <link
-      id="apple-icon"
-      rel="apple-touch-icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23002855'/%3E%3Cpath d='M50 15 L20 30 L20 60 C20 80 50 90 50 90 C50 90 80 80 80 60 L80 30 Z' fill='%23002855' stroke='%23eab308' stroke-width='5'/%3E%3Ctext x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' fill='%23eab308' text-anchor='middle' dominant-baseline='middle'%3EPRF%3C/text%3E%3C/svg%3E"
-    />
+    <link id="favicon" rel="icon" type="image/webp" href="logo.webp" />
+    <link id="apple-icon" rel="apple-touch-icon" href="logo.webp" />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -74,10 +65,11 @@
         padding: 0;
         box-sizing: border-box;
         font-family: "Inter", sans-serif;
+        /* Transições Suaves Aprimoradas */
         transition:
-          background-color 0.3s,
-          color 0.3s,
-          border-color 0.3s;
+          background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+          color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+          border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       body {
@@ -166,11 +158,7 @@
         align-items: center;
         gap: 10px;
       }
-      .login-logo i {
-        color: var(--accent-color);
-        font-size: 3.5rem;
-        filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2));
-      }
+
       .auth-input {
         width: 100%;
         padding: 14px 16px;
@@ -230,6 +218,9 @@
         position: sticky;
         top: 0;
         z-index: 100;
+        transition:
+          transform 0.4s ease,
+          opacity 0.4s ease;
       }
       .logo {
         font-weight: 800;
@@ -239,10 +230,6 @@
         align-items: center;
         gap: 8px;
         cursor: pointer;
-      }
-      .logo i {
-        color: var(--accent-color);
-        font-size: 1.5rem;
       }
       .nav-controls {
         display: flex;
@@ -392,18 +379,21 @@
         max-width: 1300px;
         margin: 2rem auto;
         padding: 0 1.5rem;
+        transition: all 0.4s ease;
       }
       .dashboard-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2rem;
+        transition: all 0.4s ease;
       }
       .tools-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 1.5rem;
         margin-bottom: 3rem;
+        transition: all 0.4s ease;
       }
 
       .panel-card {
@@ -414,6 +404,7 @@
         border: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .panel-title {
         font-size: 1.1rem;
@@ -535,6 +526,58 @@
         border: 1px dashed var(--border-color);
       }
 
+      /* Elementos do Zen Mode */
+      .zen-btn {
+        position: absolute;
+        left: 0;
+        top: -5px;
+        background: var(--bg-color);
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s;
+      }
+      .zen-btn:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+
+      /* Classes Dinâmicas Modo Foco Zen */
+      body.zen-mode .navbar,
+      body.zen-mode .daily-goals,
+      body.zen-mode .tools-grid,
+      body.zen-mode .section-header,
+      body.zen-mode .grid-subjects,
+      body.zen-mode .waiting-list,
+      body.zen-mode .chart-container,
+      body.zen-mode #chart-subtitle,
+      body.zen-mode .prediction-text,
+      body.zen-mode .panel-card:not(.pomodoro-card) {
+        display: none !important;
+      }
+      body.zen-mode .dashboard-grid {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      body.zen-mode .pomodoro-card {
+        width: 100%;
+        max-width: 500px;
+        transform: scale(1.1);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-color);
+      }
+
       .timer-display {
         font-size: 4rem;
         font-weight: 800;
@@ -606,9 +649,34 @@
         text-align: center;
       }
 
+      /* Tags Notepad */
+      .tags-container {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+      .tag-btn {
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        color: var(--primary-color);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-transform: uppercase;
+      }
+      .tag-btn:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+
       .notepad-textarea {
         width: 100%;
-        height: 150px;
+        height: 130px;
         padding: 1rem;
         border-radius: 8px;
         border: 1px solid var(--border-color);
@@ -622,6 +690,7 @@
       .notepad-textarea:focus {
         border-color: var(--primary-color);
       }
+
       .daily-log-list {
         max-height: 150px;
         overflow-y: auto;
@@ -678,6 +747,8 @@
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
       }
+
+      /* Card Hover Aprimorado */
       .subject-card {
         background: var(--surface-color);
         padding: 1.5rem;
@@ -688,7 +759,14 @@
         flex-direction: column;
         position: relative;
         overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
+      .subject-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-hover);
+      }
+
       .subject-card::before {
         content: "";
         position: absolute;
@@ -697,6 +775,7 @@
         right: 0;
         height: 4px;
         background: var(--primary-color);
+        transition: background-color 0.5s;
       }
       .subject-card.completed::before {
         background: var(--success);
@@ -730,7 +809,9 @@
         background-color: var(--primary-color);
         height: 100%;
         border-radius: 10px;
-        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        transition:
+          width 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+          background-color 0.5s;
       }
       .progress-fill.completed {
         background-color: var(--success);
@@ -797,6 +878,7 @@
         border: 1px solid var(--border-color);
         overflow: hidden;
         box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
       }
       .waiting-item {
         display: flex;
@@ -1102,14 +1184,7 @@
     <!-- ECRÃ DE SPLASH (Carregamento Inicial Otimizado) -->
     <div id="splash-screen">
       <div class="login-logo">
-        <i
-          class="ph-fill ph-shield-check"
-          style="filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2))"
-        ></i>
-        <span
-          style="font-weight: 900; letter-spacing: 1px; color: var(--text-main)"
-          >PRF</span
-        >
+        <img src="logo.webp" alt="PRF Logo" style="width: 60px; height: 60px" />
       </div>
       <div style="color: var(--text-muted); font-weight: 600; margin-top: 10px">
         Carregando Comando Central...
@@ -1121,11 +1196,15 @@
     <div id="login-screen" class="login-wrapper hidden">
       <div class="login-card">
         <div class="login-logo">
-          <i
-            class="ph-fill ph-shield-check"
-            style="filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2))"
-          ></i>
-          <span style="font-weight: 900; letter-spacing: 1px">PRF</span>
+          <img
+            src="logo.webp"
+            alt="PRF Logo"
+            style="
+              width: 70px;
+              height: 70px;
+              filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+            "
+          />
         </div>
         <h2
           style="
@@ -1146,7 +1225,6 @@
           Acesse para sincronizar seu progresso de estudos com a nuvem.
         </p>
 
-        <!-- Prevenção de Enter nativo que causa refresh da tela -->
         <input
           type="email"
           id="auth-email"
@@ -1155,7 +1233,7 @@
           onkeydown="
             if (event.key === 'Enter') {
               event.preventDefault();
-              loginWithEmail();
+              window.loginWithEmail();
             }
           "
         />
@@ -1167,7 +1245,7 @@
           onkeydown="
             if (event.key === 'Enter') {
               event.preventDefault();
-              loginWithEmail();
+              window.loginWithEmail();
             }
           "
         />
@@ -1269,11 +1347,11 @@
         <div class="nav-controls">
           <div
             id="connection-status"
-            class="status-badge-top offline"
+            class="status-badge-top online"
             title="Status de Sincronização"
           >
             <div class="status-dot"></div>
-            <span class="hide-mobile" id="connection-text">A Conectar...</span>
+            <span class="hide-mobile" id="connection-text">Online</span>
           </div>
 
           <button
@@ -1292,11 +1370,22 @@
               margin: 0 5px;
             "
           ></div>
+
+          <!-- BOTÃO CSV ADICIONADO -->
+          <button
+            class="action-icon-btn"
+            onclick="exportCSV()"
+            aria-label="Exportar Excel (CSV)"
+            title="Exportar Dados em CSV (Excel)"
+          >
+            <i class="ph ph-file-csv"></i>
+          </button>
+
           <button
             class="action-icon-btn"
             onclick="exportData()"
             aria-label="Exportar Backup"
-            title="Exportar Progresso"
+            title="Exportar Backup (JSON)"
           >
             <i class="ph ph-download-simple"></i>
           </button>
@@ -1304,7 +1393,7 @@
             class="action-icon-btn"
             onclick="triggerImport()"
             aria-label="Importar Backup"
-            title="Importar Progresso"
+            title="Importar Backup (JSON)"
           >
             <i class="ph ph-upload-simple"></i>
           </button>
@@ -1323,6 +1412,7 @@
               margin: 0 5px;
             "
           ></div>
+
           <button
             class="action-icon-btn danger"
             onclick="resetData()"
@@ -1342,7 +1432,6 @@
 
           <div class="header-user-area hide-mobile">
             <div class="user-profile">
-              <!-- Mudado para Confirm Logout ao clicar no nome -->
               <div
                 class="user-name-row"
                 onclick="confirmLogout()"
@@ -1352,6 +1441,7 @@
                   class="streak-badge"
                   id="streak-badge"
                   title="Dias seguidos a cumprir a meta"
+                  style="display: none"
                 >
                   <i
                     class="ph-fill ph-fire"
@@ -1359,7 +1449,7 @@
                   ></i>
                   <span id="streak-count">0</span>
                 </div>
-                <span id="user-display-name">Carregando...</span>
+                <span id="user-display-name">Jefferson de Araújo Silva</span>
                 <i
                   class="ph-fill ph-user-circle"
                   style="font-size: 1.8rem; color: var(--primary-color)"
@@ -1368,7 +1458,7 @@
               <div class="rank-badge" id="user-rank">🥉 Aspirante</div>
             </div>
             <div class="motivational-quote" id="daily-quote">
-              "A dor é temporária, o cargo é para sempre."
+              "O sacrifício de hoje é a farda de amanhã."
             </div>
           </div>
         </div>
@@ -1412,7 +1502,20 @@
             </button>
           </section>
 
-          <section class="panel-card" style="text-align: center">
+          <!-- POMODORO CARD (Agora com Modo Zen) -->
+          <section
+            class="panel-card pomodoro-card"
+            style="text-align: center; position: relative"
+          >
+            <!-- BOTÃO ZEN ADICIONADO -->
+            <button
+              class="zen-btn"
+              onclick="toggleZenMode()"
+              title="Ativar Modo Foco"
+            >
+              <i class="ph-bold ph-corners-out" id="zen-btn-icon"></i> Zen
+            </button>
+
             <div
               class="panel-title"
               style="justify-content: center; position: relative"
@@ -1518,7 +1621,10 @@
         <!-- Tabela de Ferramentas / Questões -->
         <div class="tools-grid">
           <section class="panel-card" style="padding: 1.5rem">
-            <div class="panel-title" style="justify-content: space-between">
+            <div
+              class="panel-title"
+              style="justify-content: space-between; margin-bottom: 1rem"
+            >
               <div style="display: flex; align-items: center; gap: 8px">
                 <i class="ph-fill ph-notepad"></i> Bloco de Notas Tático
               </div>
@@ -1534,6 +1640,21 @@
                 "
               >
                 <i class="ph-bold ph-floppy-disk"></i> Salvar
+              </button>
+            </div>
+            <!-- ETIQUETAS DO BLOCO DE NOTAS ADICIONADAS -->
+            <div class="tags-container">
+              <button class="tag-btn" onclick="insertTag('[Dúvida]')">
+                Dúvida
+              </button>
+              <button class="tag-btn" onclick="insertTag('[Resumo]')">
+                Resumo
+              </button>
+              <button class="tag-btn" onclick="insertTag('[Parei Aqui]')">
+                Parei Aqui
+              </button>
+              <button class="tag-btn" onclick="insertTag('[Revisar]')">
+                Revisar
               </button>
             </div>
             <textarea
@@ -2039,7 +2160,6 @@
         }
       }
 
-      // MOTOR DE REPARAÇÃO E MIGRAÇÃO DE DADOS AUTOMÁTICA
       const defaultState = {
         lastLogin: new Date().toDateString(),
         dailyCount: 0,
@@ -2154,7 +2274,6 @@
         return s;
       }
 
-      // Carregamento inicial super-seguro do LocalStorage
       let localData = null;
       try {
         localData = JSON.parse(localStorage.getItem("prfDashboardState"));
@@ -2227,7 +2346,6 @@
         }
       }
 
-      // --- CONTROLE DE QUESTÕES (Avançado) ---
       function addQuestion(type, amount) {
         if (typeof window.appState.questions === "undefined")
           window.appState.questions = { correct: 0, wrong: 0, blank: 0 };
@@ -2281,6 +2399,24 @@
         }
       };
 
+      // Função do Modo Foco (Zen)
+      function toggleZenMode() {
+        document.body.classList.toggle("zen-mode");
+        const isZen = document.body.classList.contains("zen-mode");
+        const zenBtnIcon = document.getElementById("zen-btn-icon");
+        if (zenBtnIcon) {
+          zenBtnIcon.className = isZen
+            ? "ph-bold ph-corners-in"
+            : "ph-bold ph-corners-out";
+        }
+        if (isZen) {
+          showToast(
+            "Modo Zen Ativado. Foco total. Pressione ESC para sair.",
+            "info",
+          );
+        }
+      }
+
       const htmlDoc = document.documentElement;
 
       function updateMetaThemeColor(theme) {
@@ -2292,15 +2428,6 @@
           );
       }
 
-      function updateFavicon(theme) {
-        const bgCor = theme === "dark" ? "%230f172a" : "%23002855";
-        const fgCor = "%23eab308";
-        const faviconSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5 L10 25 L10 60 C10 85 50 95 50 95 C50 95 90 85 90 60 L90 25 Z' fill='${bgCor}' stroke='${fgCor}' stroke-width='5'/%3E%3Ctext x='50' y='58' font-family='sans-serif' font-size='32' font-weight='bold' fill='${fgCor}' text-anchor='middle' dominant-baseline='middle'%3EPRF%3C/text%3E%3C/svg%3E`;
-        const appleSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='${bgCor}'/%3E%3Cpath d='M50 15 L20 30 L20 60 C20 80 50 90 50 90 C50 90 80 80 80 60 L80 30 Z' fill='${bgCor}' stroke='${fgCor}' stroke-width='5'/%3E%3Ctext x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' fill='${fgCor}' text-anchor='middle' dominant-baseline='middle'%3EPRF%3C/text%3E%3C/svg%3E`;
-        document.getElementById("favicon").setAttribute("href", faviconSvg);
-        document.getElementById("apple-icon").setAttribute("href", appleSvg);
-      }
-
       function initTheme() {
         const savedTheme = localStorage.getItem("prfTheme") || "light";
         htmlDoc.setAttribute("data-theme", savedTheme);
@@ -2309,7 +2436,6 @@
           themeIcon.className =
             savedTheme === "light" ? "ph ph-moon" : "ph ph-sun";
         updateMetaThemeColor(savedTheme);
-        updateFavicon(savedTheme);
       }
 
       function toggleTheme() {
@@ -2322,7 +2448,6 @@
           themeIcon.className =
             newTheme === "light" ? "ph ph-moon" : "ph ph-sun";
         updateMetaThemeColor(newTheme);
-        updateFavicon(newTheme);
         if (progressChart) updateChartTheme();
         if (weeklyChart) updateWeeklyChart();
       }
@@ -2353,6 +2478,13 @@
           origin: { y: 0.6 },
           colors: ["#002855", "#eab308", "#10b981"],
         });
+      }
+
+      // Função Auxiliar para Notificações Nativas
+      function requestNotificationPermission() {
+        if ("Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission();
+        }
       }
 
       function playAlarm() {
@@ -2432,8 +2564,46 @@
         document.body.appendChild(dl);
         dl.click();
         dl.remove();
-        showToast("Backup exportado!", "success");
+        showToast("Backup JSON exportado!", "success");
       }
+
+      // Função para Exportar dados em CSV (Excel)
+      function exportCSV() {
+        let csv = "Estatísticas PRF - Comando Central\n\n";
+
+        csv += "--- DESEMPENHO NO SIMULADOR ---\n";
+        const certas = window.appState.questions.correct || 0;
+        const erradas = window.appState.questions.wrong || 0;
+        const brancas = window.appState.questions.blank || 0;
+        csv += `Certas,${certas}\n`;
+        csv += `Erradas,${erradas}\n`;
+        csv += `Em Branco,${brancas}\n`;
+        csv += `Nota Líquida,${certas - erradas}\n\n`;
+
+        csv += "--- PROGRESSO DO EDITAL (NÚCLEO DURO) ---\n";
+        csv += "Disciplina,Aulas Assistidas,Total,Status\n";
+        window.appState.subjects.forEach((s) => {
+          const status = s.watched === s.total ? "Concluído" : "Pendente";
+          csv += `"${s.name}",${s.watched},${s.total},${status}\n`;
+        });
+
+        // Adiciona UTF-8 BOM para garantir que o Excel lê os acentos de Português corretamente
+        const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csv], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const url = URL.createObjectURL(blob);
+        const dl = document.createElement("a");
+        dl.setAttribute("href", url);
+        dl.setAttribute(
+          "download",
+          "prf_estatisticas_" + new Date().toISOString().slice(0, 10) + ".csv",
+        );
+        document.body.appendChild(dl);
+        dl.click();
+        dl.remove();
+        showToast("Relatório CSV exportado!", "success");
+      }
+
       function triggerImport() {
         document.getElementById("import-file").click();
       }
@@ -2589,6 +2759,10 @@
         const icon = document.getElementById("timer-play-icon");
         if (!icon) return;
         const btn = icon.parentElement;
+
+        // Pede permissão para notificações na primeira vez que o utilizador clicar em Play
+        requestNotificationPermission();
+
         if (isTimerRunning) {
           clearInterval(timerInterval);
           icon.className = "ph-fill ph-play";
@@ -2611,6 +2785,23 @@
               if (btn) btn.classList.remove("pulse-animation");
               updateTimerDisplay();
               playAlarm();
+
+              // Emite a Notificação Push Nativa quando termina
+              if (
+                "Notification" in window &&
+                Notification.permission === "granted"
+              ) {
+                new Notification(
+                  currentMode === "study" ? "Pausa!" : "De volta aos estudos!",
+                  {
+                    body:
+                      currentMode === "study"
+                        ? "Bom trabalho. Tire uns minutos para descansar."
+                        : "O tempo de pausa acabou. Foco na missão!",
+                  },
+                );
+              }
+
               if (currentMode === "study") {
                 window.appState.pomodorosToday++;
                 addLog("🍅 1 ciclo de foco concluído.");
@@ -2650,6 +2841,27 @@
         if (btnModeBreak)
           btnModeBreak.classList.toggle("active", m === "break");
         resetTimer();
+      }
+
+      // Função de inserção rápida de etiquetas (Tags)
+      function insertTag(tag) {
+        const textarea = document.getElementById("tactical-notes");
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        const before = text.substring(0, start);
+        const after = text.substring(end, text.length);
+
+        // Insere a tag e mete um espaço a seguir
+        textarea.value = before + tag + " " + after;
+
+        // Coloca o cursor logo a seguir à tag inserida
+        textarea.selectionStart = textarea.selectionEnd =
+          start + tag.length + 1;
+        textarea.focus();
+        autoSaveNotes();
       }
 
       function autoSaveNotes() {
@@ -2817,7 +3029,6 @@
         }
       }
 
-      // ATUALIZAÇÃO 4: Gráfico Dinâmico de Burnout (Sugestão 5)
       function updateWeeklyChart() {
         if (!weeklyChart) return;
         const labels = [];
@@ -2825,7 +3036,7 @@
         const bgColors = [];
         const isDark = htmlDoc.getAttribute("data-theme") === "dark";
         const defaultColor = isDark ? "#3b82f6" : "#002855";
-        const dangerColor = "#ef4444"; // Cor de aviso de Burnout
+        const dangerColor = "#ef4444";
         const dailyGoal = window.appState.dailyGoal || 4;
 
         for (let i = 6; i >= 0; i--) {
@@ -2841,7 +3052,6 @@
           const val = window.appState.weeklyData[iso] || 0;
           data.push(val);
 
-          // Lógica de Burnout: Se o utilizador estudar 50% ou mais além da meta, a barra fica vermelha
           if (val > 0 && val >= dailyGoal * 1.5) {
             bgColors.push(dangerColor);
           } else {
@@ -3061,12 +3271,16 @@
       }
 
       document.addEventListener("keydown", (e) => {
+        // Atalho Tecla P (Pomodoro)
         if (
           e.target.tagName !== "INPUT" &&
           e.target.tagName !== "TEXTAREA" &&
           e.key.toLowerCase() === "p"
         )
           toggleTimer();
+        // Atalho Tecla ESC (Sair do Modo Zen)
+        if (e.key === "Escape" && document.body.classList.contains("zen-mode"))
+          toggleZenMode();
       });
 
       window.onload = () => {
@@ -3091,7 +3305,6 @@
         setPersistence,
         browserLocalPersistence,
       } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-      // ATUALIZAÇÃO 3: Importar enableIndexedDbPersistence para Modo Offline
       import {
         getFirestore,
         doc,
@@ -3114,7 +3327,6 @@
       const db = getFirestore(app);
       const APP_ID = "prf-agente-administrativo";
 
-      // ATUALIZAÇÃO 3: Ativar Persistência Offline Nativa do Firestore
       enableIndexedDbPersistence(db).catch((err) => {
         if (err.code == "failed-precondition") {
           console.warn(
@@ -3166,10 +3378,9 @@
               if (loginScreen) loginScreen.classList.add("hidden");
               if (appContent) appContent.classList.remove("hidden");
 
-              // ATUALIZAÇÃO 1: Remover Splash Screen suavemente
               if (splashScreen) {
                 splashScreen.classList.add("hidden");
-                setTimeout(() => splashScreen.remove(), 500); // Remove do DOM após sumir
+                setTimeout(() => splashScreen.remove(), 500);
               }
 
               currentUser = user;
@@ -3237,15 +3448,12 @@
         })
         .catch((err) => console.error("Persistence error:", err));
 
-      // ATUALIZAÇÃO 2: Debounce de 1.5s na Gravação da Nuvem (Proteção de Base de Dados)
       window.saveToFirebase = async function () {
         if (currentUser && navigator.onLine) {
           setConnectionStatus("syncing");
 
-          // Limpa o temporizador antigo se existirem cliques rápidos seguidos
           if (debounceTimer) clearTimeout(debounceTimer);
 
-          // Configura um novo temporizador
           debounceTimer = setTimeout(async () => {
             isSyncing = true;
             try {
