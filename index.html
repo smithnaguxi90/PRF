@@ -8,7 +8,6 @@
     />
     <title>Painel de Estudos | PRF Administrativo</title>
 
-    <!-- Cores da barra do navegador -->
     <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -84,8 +83,119 @@
       body {
         background-color: var(--bg-color);
         color: var(--text-main);
-        padding-bottom: calc(4rem + env(safe-area-inset-bottom));
         overscroll-behavior-y: none;
+      }
+
+      /* TELA DE SPLASH (CARREGAMENTO) */
+      #splash-screen {
+        position: fixed;
+        inset: 0;
+        background: var(--bg-color);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition:
+          opacity 0.5s ease,
+          visibility 0.5s;
+      }
+      #splash-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-color);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-top: 1.5rem;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* TELA DE LOGIN */
+      .login-wrapper {
+        position: fixed;
+        inset: 0;
+        background: var(--bg-color);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        transition:
+          opacity 0.4s ease,
+          visibility 0.4s;
+      }
+      .login-wrapper.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .login-card {
+        background: var(--surface-color);
+        width: 100%;
+        max-width: 420px;
+        padding: 3rem 2.5rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        text-align: center;
+        transform: translateY(0);
+        transition: transform 0.4s ease;
+      }
+      .login-wrapper.hidden .login-card {
+        transform: translateY(20px);
+      }
+      .login-logo {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+      .login-logo i {
+        color: var(--accent-color);
+        font-size: 3.5rem;
+        filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2));
+      }
+      .auth-input {
+        width: 100%;
+        padding: 14px 16px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-color);
+        color: var(--text-main);
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+      .auth-input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+      }
+
+      /* CONTENT WRAPPER */
+      #app-content {
+        padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+        opacity: 1;
+        transition: opacity 0.4s ease;
+      }
+      #app-content.hidden {
+        display: none;
+        opacity: 0;
       }
 
       button,
@@ -749,7 +859,7 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        z-index: 1000;
+        z-index: 10000;
       }
       .toast {
         background: var(--surface-color);
@@ -935,22 +1045,6 @@
         top: -2px;
       }
 
-      .auth-input {
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        background: var(--bg-color);
-        color: var(--text-main);
-        font-size: 1rem;
-        transition: border-color 0.2s;
-      }
-      .auth-input:focus {
-        border-color: var(--primary-color);
-        outline: none;
-      }
-
       @media (max-width: 650px) {
         .hide-mobile {
           display: none !important;
@@ -1005,708 +1099,785 @@
     </style>
   </head>
   <body>
-    <!-- Navegação Superior -->
-    <header class="navbar">
-      <div
-        class="logo"
-        onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
-        title="Voltar ao topo"
-      >
+    <!-- ECRÃ DE SPLASH (Carregamento Inicial Otimizado) -->
+    <div id="splash-screen">
+      <div class="login-logo">
         <i
           class="ph-fill ph-shield-check"
           style="filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2))"
         ></i>
         <span
-          class="hide-mobile"
-          style="display: flex; align-items: center; gap: 10px"
+          style="font-weight: 900; letter-spacing: 1px; color: var(--text-main)"
+          >PRF</span
         >
+      </div>
+      <div style="color: var(--text-muted); font-weight: 600; margin-top: 10px">
+        Carregando Comando Central...
+      </div>
+      <div class="spinner"></div>
+    </div>
+
+    <!-- TELA DE LOGIN DEDICADA -->
+    <div id="login-screen" class="login-wrapper hidden">
+      <div class="login-card">
+        <div class="login-logo">
+          <i
+            class="ph-fill ph-shield-check"
+            style="filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2))"
+          ></i>
           <span style="font-weight: 900; letter-spacing: 1px">PRF</span>
-          <span
-            style="
-              width: 5px;
-              height: 5px;
-              background-color: var(--accent-color);
-              border-radius: 50%;
-            "
-          ></span>
-          <span
-            style="
-              font-weight: 600;
-              color: var(--text-muted);
-              font-size: 0.8rem;
-              text-transform: uppercase;
-              letter-spacing: 2.5px;
-              margin-top: 2px;
-            "
-            >Dashboard</span
-          >
-        </span>
-      </div>
-      <div class="nav-controls">
-        <div
-          id="connection-status"
-          class="status-badge-top offline"
-          title="Status de Sincronização"
-        >
-          <div class="status-dot"></div>
-          <span class="hide-mobile" id="connection-text">A Conectar...</span>
         </div>
-
-        <button
-          class="action-icon-btn"
-          onclick="openModal('tactical-modal')"
-          aria-label="Manual Tático"
-          title="Manual Tático de Produtividade"
-        >
-          <i class="ph ph-book-open-text"></i>
-        </button>
-        <div
-          style="
-            width: 1px;
-            height: 24px;
-            background: var(--border-color);
-            margin: 0 5px;
-          "
-        ></div>
-        <button
-          class="action-icon-btn"
-          onclick="exportData()"
-          aria-label="Exportar Backup"
-          title="Exportar Progresso"
-        >
-          <i class="ph ph-download-simple"></i>
-        </button>
-        <button
-          class="action-icon-btn"
-          onclick="triggerImport()"
-          aria-label="Importar Backup"
-          title="Importar Progresso"
-        >
-          <i class="ph ph-upload-simple"></i>
-        </button>
-        <input
-          type="file"
-          id="import-file"
-          accept=".json"
-          style="display: none"
-          onchange="importData(event)"
-        />
-        <div
-          style="
-            width: 1px;
-            height: 24px;
-            background: var(--border-color);
-            margin: 0 5px;
-          "
-        ></div>
-        <button
-          class="action-icon-btn danger"
-          onclick="resetData()"
-          aria-label="Reiniciar Dados"
-          title="Reiniciar todos os dados"
-        >
-          <i class="ph ph-arrow-counter-clockwise"></i>
-        </button>
-        <button
-          class="action-icon-btn"
-          onclick="toggleTheme()"
-          aria-label="Alternar Tema"
-          title="Alternar Modo Escuro"
-        >
-          <i class="ph ph-moon" id="theme-icon"></i>
-        </button>
-
-        <div class="header-user-area hide-mobile">
-          <div class="user-profile">
-            <div
-              class="user-name-row"
-              onclick="openAuthModal()"
-              title="Gerir Conta"
-            >
-              <div
-                class="streak-badge"
-                id="streak-badge"
-                title="Dias seguidos a cumprir a meta"
-              >
-                <i
-                  class="ph-fill ph-fire"
-                  style="color: var(--accent-color)"
-                ></i>
-                <span id="streak-count">0</span>
-              </div>
-              <span id="user-display-name">Carregando...</span>
-              <i
-                class="ph-fill ph-user-circle"
-                style="font-size: 1.8rem; color: var(--primary-color)"
-              ></i>
-            </div>
-            <div class="rank-badge" id="user-rank">🥉 Aspirante</div>
-          </div>
-          <div class="motivational-quote" id="daily-quote">
-            "A dor é temporária, o cargo é para sempre."
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <main class="container">
-      <div class="dashboard-grid">
-        <section class="panel-card daily-goals">
-          <div class="panel-title" style="justify-content: center">
-            <i class="ph-fill ph-target"></i> Objetivo Diário
-          </div>
-          <p style="color: var(--text-muted); font-size: 0.95rem">
-            Mantenha a consistência diária.
-          </p>
-          <div class="goal-tracker">
-            <span id="aulas-hoje">0</span>
-            <span class="total" id="meta-total">/4</span>
-            <button
-              class="btn-edit-small"
-              onclick="editDailyGoal()"
-              aria-label="Editar Meta Diária"
-              title="Alterar meta"
-            >
-              <i class="ph-bold ph-pencil-simple"></i>
-            </button>
-          </div>
-          <div class="progress-track" style="height: 12px">
-            <div
-              class="progress-fill goal"
-              id="meta-fill"
-              style="width: 0%"
-            ></div>
-          </div>
-          <button
-            id="btn-goal"
-            class="btn-primary"
-            onclick="addDailyGoal()"
-            aria-label="Registrar aula genérica"
-          >
-            <i class="ph-bold ph-plus"></i> Registrar Aula do Dia
-          </button>
-        </section>
-
-        <section class="panel-card" style="text-align: center">
-          <div
-            class="panel-title"
-            style="justify-content: center; position: relative"
-          >
-            <i class="ph-fill ph-timer"></i> Cronômetro Pomodoro
-            <button
-              class="btn-edit-small"
-              onclick="configPomodoro()"
-              style="position: absolute; right: 0; top: -5px"
-              title="Configurar Tempos"
-            >
-              <i class="ph-bold ph-gear"></i>
-            </button>
-          </div>
-          <div class="timer-display" id="timer-display">50:00</div>
-          <div class="timer-controls">
-            <button
-              class="timer-btn"
-              onclick="toggleTimer()"
-              aria-label="Iniciar ou Pausar"
-            >
-              <i class="ph-fill ph-play" id="timer-play-icon"></i>
-            </button>
-            <button
-              class="timer-btn secondary"
-              onclick="resetTimer()"
-              aria-label="Reiniciar"
-            >
-              <i class="ph-bold ph-arrow-counter-clockwise"></i>
-            </button>
-          </div>
-          <div class="timer-modes">
-            <button
-              class="mode-btn active"
-              id="btn-mode-study"
-              onclick="setTimerMode('study')"
-            >
-              Estudo
-            </button>
-            <button
-              class="mode-btn"
-              id="btn-mode-break"
-              onclick="setTimerMode('break')"
-            >
-              Pausa
-            </button>
-          </div>
-          <div
-            class="pomodoro-marks"
-            id="pomodoro-marks"
-            title="Ciclos concluídos hoje"
-          ></div>
-        </section>
-
-        <section class="panel-card">
-          <div class="panel-title">
-            <i class="ph-fill ph-chart-pie-slice"></i> Progresso do Edital
-          </div>
-          <div class="chart-container">
-            <canvas id="progressChart" aria-label="Gráfico do edital"></canvas>
-          </div>
-          <p
-            id="chart-subtitle"
-            style="
-              text-align: center;
-              margin-top: 10px;
-              font-weight: 600;
-              font-size: 0.9rem;
-            "
-          ></p>
-          <div class="prediction-text" id="prediction-text">
-            <i
-              class="ph-bold ph-calendar-check"
-              style="color: var(--primary-color)"
-            ></i>
-            Previsão: Calculando...
-          </div>
-        </section>
-
-        <section class="panel-card">
-          <div class="panel-title">
-            <i class="ph-fill ph-chart-bar"></i> Produtividade (7 Dias)
-          </div>
-          <div class="chart-container" style="height: 170px">
-            <canvas id="weeklyChart" aria-label="Gráfico Semanal"></canvas>
-          </div>
-          <p
-            style="
-              text-align: center;
-              margin-top: 10px;
-              font-size: 0.85rem;
-              color: var(--text-muted);
-            "
-          >
-            Evite o esgotamento: mantenha as barras consistentes.
-          </p>
-        </section>
-      </div>
-
-      <!-- Tabela de Ferramentas / Questões -->
-      <div class="tools-grid">
-        <section class="panel-card" style="padding: 1.5rem">
-          <div class="panel-title" style="justify-content: space-between">
-            <div style="display: flex; align-items: center; gap: 8px">
-              <i class="ph-fill ph-notepad"></i> Bloco de Notas Tático
-            </div>
-            <button
-              class="btn-edit-small"
-              onclick="manualSaveNotes()"
-              title="Salvar Notas"
-              style="
-                width: auto;
-                padding: 0 12px;
-                border-radius: 15px;
-                font-weight: 600;
-              "
-            >
-              <i class="ph-bold ph-floppy-disk"></i> Salvar
-            </button>
-          </div>
-          <textarea
-            id="tactical-notes"
-            class="notepad-textarea"
-            placeholder="Ex: Dir. Administrativo - Parei na aula 14 aos 25:00 min..."
-            oninput="autoSaveNotes()"
-          ></textarea>
-        </section>
-
-        <!-- Desempenho de Questões CEBRASPE -->
-        <section class="panel-card" style="padding: 1.5rem; text-align: center">
-          <div class="panel-title" style="justify-content: space-between">
-            <div style="display: flex; align-items: center; gap: 8px">
-              <i class="ph-fill ph-list-checks"></i> Simulador CEBRASPE
-            </div>
-            <div
-              id="q-total-badge"
-              style="
-                font-size: 0.75rem;
-                background: var(--bg-color);
-                padding: 4px 10px;
-                border-radius: 12px;
-                border: 1px solid var(--border-color);
-                color: var(--text-muted);
-                font-weight: 700;
-                text-transform: uppercase;
-              "
-            >
-              Total: 0
-            </div>
-          </div>
-
-          <div
-            style="
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 10px;
-              margin-bottom: 1.5rem;
-              text-align: center;
-            "
-          >
-            <!-- Certas -->
-            <div
-              style="
-                background: rgba(16, 185, 129, 0.05);
-                border: 1px solid rgba(16, 185, 129, 0.2);
-                border-radius: 12px;
-                padding: 10px;
-              "
-            >
-              <div
-                style="
-                  color: var(--success);
-                  font-weight: 800;
-                  font-size: 1.8rem;
-                  line-height: 1.2;
-                "
-                id="q-correct"
-              >
-                0
-              </div>
-              <div
-                style="
-                  font-size: 0.7rem;
-                  color: var(--success);
-                  margin-bottom: 8px;
-                  font-weight: 700;
-                  text-transform: uppercase;
-                "
-              >
-                Certas
-              </div>
-              <div style="display: flex; gap: 5px; justify-content: center">
-                <button
-                  class="btn-edit-small"
-                  onclick="addQuestion('correct', -1)"
-                >
-                  -
-                </button>
-                <button
-                  class="btn-edit-small"
-                  style="background: var(--success); color: white; border: none"
-                  onclick="addQuestion('correct', 1)"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-            <!-- Erradas -->
-            <div
-              style="
-                background: rgba(239, 68, 68, 0.05);
-                border: 1px solid rgba(239, 68, 68, 0.2);
-                border-radius: 12px;
-                padding: 10px;
-              "
-            >
-              <div
-                style="
-                  color: var(--danger);
-                  font-weight: 800;
-                  font-size: 1.8rem;
-                  line-height: 1.2;
-                "
-                id="q-wrong"
-              >
-                0
-              </div>
-              <div
-                style="
-                  font-size: 0.7rem;
-                  color: var(--danger);
-                  margin-bottom: 8px;
-                  font-weight: 700;
-                  text-transform: uppercase;
-                "
-              >
-                Erradas
-              </div>
-              <div style="display: flex; gap: 5px; justify-content: center">
-                <button
-                  class="btn-edit-small"
-                  onclick="addQuestion('wrong', -1)"
-                >
-                  -
-                </button>
-                <button
-                  class="btn-edit-small"
-                  style="background: var(--danger); color: white; border: none"
-                  onclick="addQuestion('wrong', 1)"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-            <!-- Em Branco -->
-            <div
-              style="
-                background: var(--bg-color);
-                border: 1px solid var(--border-color);
-                border-radius: 12px;
-                padding: 10px;
-              "
-            >
-              <div
-                style="
-                  color: var(--text-muted);
-                  font-weight: 800;
-                  font-size: 1.8rem;
-                  line-height: 1.2;
-                "
-                id="q-blank"
-              >
-                0
-              </div>
-              <div
-                style="
-                  font-size: 0.7rem;
-                  color: var(--text-muted);
-                  margin-bottom: 8px;
-                  font-weight: 700;
-                  text-transform: uppercase;
-                "
-              >
-                Branco
-              </div>
-              <div style="display: flex; gap: 5px; justify-content: center">
-                <button
-                  class="btn-edit-small"
-                  onclick="addQuestion('blank', -1)"
-                >
-                  -
-                </button>
-                <button
-                  class="btn-edit-small"
-                  style="
-                    background: var(--text-muted);
-                    color: white;
-                    border: none;
-                  "
-                  onclick="addQuestion('blank', 1)"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Nota Líquida e Precisão -->
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              background: var(--bg-color);
-              padding: 12px 15px;
-              border-radius: 12px;
-              border: 1px solid var(--border-color);
-            "
-          >
-            <div>
-              <div
-                style="
-                  font-size: 0.75rem;
-                  color: var(--text-muted);
-                  font-weight: 700;
-                  text-transform: uppercase;
-                "
-              >
-                Nota Líquida
-              </div>
-              <div
-                id="q-liquida"
-                style="
-                  font-weight: 900;
-                  font-size: 1.8rem;
-                  color: var(--primary-color);
-                  line-height: 1.1;
-                "
-              >
-                0
-              </div>
-            </div>
-            <div style="text-align: right">
-              <div
-                style="
-                  font-size: 0.75rem;
-                  color: var(--text-muted);
-                  font-weight: 700;
-                  text-transform: uppercase;
-                "
-              >
-                Precisão
-              </div>
-              <div
-                id="q-accuracy"
-                style="
-                  font-weight: 900;
-                  font-size: 1.5rem;
-                  color: var(--text-main);
-                  line-height: 1.1;
-                "
-              >
-                0%
-              </div>
-            </div>
-          </div>
-
-          <!-- Barra de Precisão -->
-          <div
-            class="progress-track"
-            style="
-              margin-top: 10px;
-              height: 6px;
-              background: rgba(239, 68, 68, 0.15);
-              border-radius: 10px;
-              overflow: hidden;
-              display: flex;
-            "
-          >
-            <div
-              id="q-accuracy-bar"
-              style="
-                width: 0%;
-                background: var(--success);
-                height: 100%;
-                transition: width 0.5s ease;
-              "
-            ></div>
-          </div>
-        </section>
-
-        <section class="panel-card" style="padding: 1.5rem">
-          <div class="panel-title">
-            <i class="ph-fill ph-list-checks"></i> Registro de Missões (Hoje)
-          </div>
-          <div class="daily-log-list" id="daily-log-list"></div>
-        </section>
-      </div>
-
-      <header class="section-header">
-        <h2>
-          <i
-            class="ph-fill ph-books"
-            style="font-size: 1.8rem; color: var(--primary-color)"
-          ></i>
-          Núcleo Duro (Fase Atual)
-        </h2>
-      </header>
-      <section class="grid-subjects" id="active-subjects"></section>
-
-      <header
-        class="section-header"
-        id="completed-header"
-        style="display: none"
-      >
-        <h2>
-          <i
-            class="ph-fill ph-check-circle"
-            style="font-size: 1.8rem; color: var(--success)"
-          ></i>
-          Disciplinas Concluídas
-        </h2>
-      </header>
-      <section class="grid-subjects" id="completed-subjects"></section>
-
-      <header class="section-header">
-        <h2>
-          <i
-            class="ph-fill ph-hourglass-high"
-            style="font-size: 1.8rem; color: var(--text-muted)"
-          ></i>
-          Fila de Espera
-        </h2>
-        <button
-          class="btn-edit-small"
-          onclick="addSubject()"
-          title="Adicionar nova matéria ao edital"
-          style="
-            width: auto;
-            padding: 0 12px;
-            border-radius: 15px;
-            font-weight: 600;
-          "
-        >
-          <i class="ph-bold ph-plus"></i> Nova Disciplina
-        </button>
-      </header>
-      <section class="waiting-list" id="waiting-subjects"></section>
-    </main>
-
-    <!-- Modal de Autenticação -->
-    <div class="modal-backdrop" id="auth-modal" onclick="closeAuthModal(event)">
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="close-modal-btn" onclick="closeAuthModal(event)">
-          <i class="ph-bold ph-x"></i>
-        </button>
         <h2
           style="
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.4rem;
+            color: var(--text-main);
+          "
+        >
+          Comando Central
+        </h2>
+        <p
+          style="
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+          "
+        >
+          Acesse para sincronizar seu progresso de estudos com a nuvem.
+        </p>
+
+        <!-- Prevenção de Enter nativo que causa refresh da tela -->
+        <input
+          type="email"
+          id="auth-email"
+          class="auth-input"
+          placeholder="Seu E-mail"
+          onkeydown="
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              loginWithEmail();
+            }
+          "
+        />
+        <input
+          type="password"
+          id="auth-password"
+          class="auth-input"
+          placeholder="Sua Senha"
+          onkeydown="
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              loginWithEmail();
+            }
+          "
+        />
+
+        <button
+          class="btn-primary"
+          onclick="loginWithEmail()"
+          style="margin-top: 0.5rem"
+        >
+          Entrar na Conta
+        </button>
+        <button
+          class="btn-primary secondary"
+          onclick="registerWithEmail()"
+          style="margin-top: 0.8rem"
+        >
+          Criar Nova Conta
+        </button>
+
+        <div
+          style="
+            margin: 1.5rem 0;
             display: flex;
             align-items: center;
             gap: 10px;
           "
         >
-          <i class="ph-fill ph-user-circle"></i> Conta PRF
-        </h2>
-        <p
-          style="
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-          "
-          id="auth-status-msg"
-        >
-          Faça login para salvar permanentemente o seu progresso na nuvem.
-        </p>
-
-        <div id="auth-form-area">
-          <input
-            type="email"
-            id="auth-email"
-            class="auth-input"
-            placeholder="E-mail de acesso"
-          />
-          <input
-            type="password"
-            id="auth-password"
-            class="auth-input"
-            placeholder="Senha"
-          />
-          <div style="display: flex; gap: 10px">
-            <button
-              class="btn-primary"
-              onclick="loginWithEmail()"
-              style="margin-top: 0"
-            >
-              Entrar
-            </button>
-            <button
-              class="btn-primary secondary"
-              onclick="registerWithEmail()"
-              style="margin-top: 0"
-            >
-              Criar Conta
-            </button>
-          </div>
+          <div
+            style="flex: 1; height: 1px; background: var(--border-color)"
+          ></div>
+          <span
+            style="
+              font-size: 0.8rem;
+              color: var(--text-muted);
+              text-transform: uppercase;
+              font-weight: 600;
+            "
+            >Ou</span
+          >
+          <div
+            style="flex: 1; height: 1px; background: var(--border-color)"
+          ></div>
         </div>
 
         <button
-          class="btn-primary danger"
-          onclick="logoutFirebase()"
-          style="margin-top: 10px; display: none"
-          id="btn-logout"
+          class="btn-primary"
+          style="
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px dashed var(--border-color);
+            box-shadow: none;
+          "
+          onclick="loginAnonymously()"
         >
-          Sair da Conta
+          Entrar sem conta (Salva apenas no dispositivo)
         </button>
       </div>
     </div>
+
+    <!-- CONTEÚDO PRINCIPAL DO APP -->
+    <div id="app-content" class="hidden">
+      <!-- Navegação Superior -->
+      <header class="navbar">
+        <div
+          class="logo"
+          onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+          title="Voltar ao topo"
+        >
+          <i
+            class="ph-fill ph-shield-check"
+            style="filter: drop-shadow(0 2px 4px rgba(234, 179, 8, 0.2))"
+          ></i>
+          <span
+            class="hide-mobile"
+            style="display: flex; align-items: center; gap: 10px"
+          >
+            <span style="font-weight: 900; letter-spacing: 1px">PRF</span>
+            <span
+              style="
+                width: 5px;
+                height: 5px;
+                background-color: var(--accent-color);
+                border-radius: 50%;
+              "
+            ></span>
+            <span
+              style="
+                font-weight: 600;
+                color: var(--text-muted);
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 2.5px;
+                margin-top: 2px;
+              "
+              >Dashboard</span
+            >
+          </span>
+        </div>
+        <div class="nav-controls">
+          <div
+            id="connection-status"
+            class="status-badge-top offline"
+            title="Status de Sincronização"
+          >
+            <div class="status-dot"></div>
+            <span class="hide-mobile" id="connection-text">A Conectar...</span>
+          </div>
+
+          <button
+            class="action-icon-btn"
+            onclick="openModal('tactical-modal')"
+            aria-label="Manual Tático"
+            title="Manual Tático de Produtividade"
+          >
+            <i class="ph ph-book-open-text"></i>
+          </button>
+          <div
+            style="
+              width: 1px;
+              height: 24px;
+              background: var(--border-color);
+              margin: 0 5px;
+            "
+          ></div>
+          <button
+            class="action-icon-btn"
+            onclick="exportData()"
+            aria-label="Exportar Backup"
+            title="Exportar Progresso"
+          >
+            <i class="ph ph-download-simple"></i>
+          </button>
+          <button
+            class="action-icon-btn"
+            onclick="triggerImport()"
+            aria-label="Importar Backup"
+            title="Importar Progresso"
+          >
+            <i class="ph ph-upload-simple"></i>
+          </button>
+          <input
+            type="file"
+            id="import-file"
+            accept=".json"
+            style="display: none"
+            onchange="importData(event)"
+          />
+          <div
+            style="
+              width: 1px;
+              height: 24px;
+              background: var(--border-color);
+              margin: 0 5px;
+            "
+          ></div>
+          <button
+            class="action-icon-btn danger"
+            onclick="resetData()"
+            aria-label="Reiniciar Dados"
+            title="Reiniciar todos os dados"
+          >
+            <i class="ph ph-arrow-counter-clockwise"></i>
+          </button>
+          <button
+            class="action-icon-btn"
+            onclick="toggleTheme()"
+            aria-label="Alternar Tema"
+            title="Alternar Modo Escuro"
+          >
+            <i class="ph ph-moon" id="theme-icon"></i>
+          </button>
+
+          <div class="header-user-area hide-mobile">
+            <div class="user-profile">
+              <!-- Mudado para Confirm Logout ao clicar no nome -->
+              <div
+                class="user-name-row"
+                onclick="confirmLogout()"
+                title="Sair da Conta"
+              >
+                <div
+                  class="streak-badge"
+                  id="streak-badge"
+                  title="Dias seguidos a cumprir a meta"
+                >
+                  <i
+                    class="ph-fill ph-fire"
+                    style="color: var(--accent-color)"
+                  ></i>
+                  <span id="streak-count">0</span>
+                </div>
+                <span id="user-display-name">Carregando...</span>
+                <i
+                  class="ph-fill ph-user-circle"
+                  style="font-size: 1.8rem; color: var(--primary-color)"
+                ></i>
+              </div>
+              <div class="rank-badge" id="user-rank">🥉 Aspirante</div>
+            </div>
+            <div class="motivational-quote" id="daily-quote">
+              "A dor é temporária, o cargo é para sempre."
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="container">
+        <div class="dashboard-grid">
+          <section class="panel-card daily-goals">
+            <div class="panel-title" style="justify-content: center">
+              <i class="ph-fill ph-target"></i> Objetivo Diário
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem">
+              Mantenha a consistência diária.
+            </p>
+            <div class="goal-tracker">
+              <span id="aulas-hoje">0</span>
+              <span class="total" id="meta-total">/4</span>
+              <button
+                class="btn-edit-small"
+                onclick="editDailyGoal()"
+                aria-label="Editar Meta Diária"
+                title="Alterar meta"
+              >
+                <i class="ph-bold ph-pencil-simple"></i>
+              </button>
+            </div>
+            <div class="progress-track" style="height: 12px">
+              <div
+                class="progress-fill goal"
+                id="meta-fill"
+                style="width: 0%"
+              ></div>
+            </div>
+            <button
+              id="btn-goal"
+              class="btn-primary"
+              onclick="addDailyGoal()"
+              aria-label="Registrar aula genérica"
+            >
+              <i class="ph-bold ph-plus"></i> Registrar Aula do Dia
+            </button>
+          </section>
+
+          <section class="panel-card" style="text-align: center">
+            <div
+              class="panel-title"
+              style="justify-content: center; position: relative"
+            >
+              <i class="ph-fill ph-timer"></i> Cronômetro Pomodoro
+              <button
+                class="btn-edit-small"
+                onclick="configPomodoro()"
+                style="position: absolute; right: 0; top: -5px"
+                title="Configurar Tempos"
+              >
+                <i class="ph-bold ph-gear"></i>
+              </button>
+            </div>
+            <div class="timer-display" id="timer-display">50:00</div>
+            <div class="timer-controls">
+              <button
+                class="timer-btn"
+                onclick="toggleTimer()"
+                aria-label="Iniciar ou Pausar"
+              >
+                <i class="ph-fill ph-play" id="timer-play-icon"></i>
+              </button>
+              <button
+                class="timer-btn secondary"
+                onclick="resetTimer()"
+                aria-label="Reiniciar"
+              >
+                <i class="ph-bold ph-arrow-counter-clockwise"></i>
+              </button>
+            </div>
+            <div class="timer-modes">
+              <button
+                class="mode-btn active"
+                id="btn-mode-study"
+                onclick="setTimerMode('study')"
+              >
+                Estudo
+              </button>
+              <button
+                class="mode-btn"
+                id="btn-mode-break"
+                onclick="setTimerMode('break')"
+              >
+                Pausa
+              </button>
+            </div>
+            <div
+              class="pomodoro-marks"
+              id="pomodoro-marks"
+              title="Ciclos concluídos hoje"
+            ></div>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-title">
+              <i class="ph-fill ph-chart-pie-slice"></i> Progresso do Edital
+            </div>
+            <div class="chart-container">
+              <canvas
+                id="progressChart"
+                aria-label="Gráfico do edital"
+              ></canvas>
+            </div>
+            <p
+              id="chart-subtitle"
+              style="
+                text-align: center;
+                margin-top: 10px;
+                font-weight: 600;
+                font-size: 0.9rem;
+              "
+            ></p>
+            <div class="prediction-text" id="prediction-text">
+              <i
+                class="ph-bold ph-calendar-check"
+                style="color: var(--primary-color)"
+              ></i>
+              Previsão: Calculando...
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-title">
+              <i class="ph-fill ph-chart-bar"></i> Produtividade (7 Dias)
+            </div>
+            <div class="chart-container" style="height: 170px">
+              <canvas id="weeklyChart" aria-label="Gráfico Semanal"></canvas>
+            </div>
+            <p
+              style="
+                text-align: center;
+                margin-top: 10px;
+                font-size: 0.85rem;
+                color: var(--text-muted);
+              "
+            >
+              Evite o esgotamento: mantenha as barras consistentes.
+            </p>
+          </section>
+        </div>
+
+        <!-- Tabela de Ferramentas / Questões -->
+        <div class="tools-grid">
+          <section class="panel-card" style="padding: 1.5rem">
+            <div class="panel-title" style="justify-content: space-between">
+              <div style="display: flex; align-items: center; gap: 8px">
+                <i class="ph-fill ph-notepad"></i> Bloco de Notas Tático
+              </div>
+              <button
+                class="btn-edit-small"
+                onclick="manualSaveNotes()"
+                title="Salvar Notas"
+                style="
+                  width: auto;
+                  padding: 0 12px;
+                  border-radius: 15px;
+                  font-weight: 600;
+                "
+              >
+                <i class="ph-bold ph-floppy-disk"></i> Salvar
+              </button>
+            </div>
+            <textarea
+              id="tactical-notes"
+              class="notepad-textarea"
+              placeholder="Ex: Dir. Administrativo - Parei na aula 14 aos 25:00 min..."
+              oninput="autoSaveNotes()"
+            ></textarea>
+          </section>
+
+          <!-- Desempenho de Questões CEBRASPE -->
+          <section
+            class="panel-card"
+            style="padding: 1.5rem; text-align: center"
+          >
+            <div class="panel-title" style="justify-content: space-between">
+              <div style="display: flex; align-items: center; gap: 8px">
+                <i class="ph-fill ph-list-checks"></i> Simulador CEBRASPE
+              </div>
+              <div
+                id="q-total-badge"
+                style="
+                  font-size: 0.75rem;
+                  background: var(--bg-color);
+                  padding: 4px 10px;
+                  border-radius: 12px;
+                  border: 1px solid var(--border-color);
+                  color: var(--text-muted);
+                  font-weight: 700;
+                  text-transform: uppercase;
+                "
+              >
+                Total: 0
+              </div>
+            </div>
+
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin-bottom: 1.5rem;
+                text-align: center;
+              "
+            >
+              <!-- Certas -->
+              <div
+                style="
+                  background: rgba(16, 185, 129, 0.05);
+                  border: 1px solid rgba(16, 185, 129, 0.2);
+                  border-radius: 12px;
+                  padding: 10px;
+                "
+              >
+                <div
+                  style="
+                    color: var(--success);
+                    font-weight: 800;
+                    font-size: 1.8rem;
+                    line-height: 1.2;
+                  "
+                  id="q-correct"
+                >
+                  0
+                </div>
+                <div
+                  style="
+                    font-size: 0.7rem;
+                    color: var(--success);
+                    margin-bottom: 8px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                  "
+                >
+                  Certas
+                </div>
+                <div style="display: flex; gap: 5px; justify-content: center">
+                  <button
+                    class="btn-edit-small"
+                    onclick="addQuestion('correct', -1)"
+                  >
+                    -
+                  </button>
+                  <button
+                    class="btn-edit-small"
+                    style="
+                      background: var(--success);
+                      color: white;
+                      border: none;
+                    "
+                    onclick="addQuestion('correct', 1)"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <!-- Erradas -->
+              <div
+                style="
+                  background: rgba(239, 68, 68, 0.05);
+                  border: 1px solid rgba(239, 68, 68, 0.2);
+                  border-radius: 12px;
+                  padding: 10px;
+                "
+              >
+                <div
+                  style="
+                    color: var(--danger);
+                    font-weight: 800;
+                    font-size: 1.8rem;
+                    line-height: 1.2;
+                  "
+                  id="q-wrong"
+                >
+                  0
+                </div>
+                <div
+                  style="
+                    font-size: 0.7rem;
+                    color: var(--danger);
+                    margin-bottom: 8px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                  "
+                >
+                  Erradas
+                </div>
+                <div style="display: flex; gap: 5px; justify-content: center">
+                  <button
+                    class="btn-edit-small"
+                    onclick="addQuestion('wrong', -1)"
+                  >
+                    -
+                  </button>
+                  <button
+                    class="btn-edit-small"
+                    style="
+                      background: var(--danger);
+                      color: white;
+                      border: none;
+                    "
+                    onclick="addQuestion('wrong', 1)"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <!-- Em Branco -->
+              <div
+                style="
+                  background: var(--bg-color);
+                  border: 1px solid var(--border-color);
+                  border-radius: 12px;
+                  padding: 10px;
+                "
+              >
+                <div
+                  style="
+                    color: var(--text-muted);
+                    font-weight: 800;
+                    font-size: 1.8rem;
+                    line-height: 1.2;
+                  "
+                  id="q-blank"
+                >
+                  0
+                </div>
+                <div
+                  style="
+                    font-size: 0.7rem;
+                    color: var(--text-muted);
+                    margin-bottom: 8px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                  "
+                >
+                  Branco
+                </div>
+                <div style="display: flex; gap: 5px; justify-content: center">
+                  <button
+                    class="btn-edit-small"
+                    onclick="addQuestion('blank', -1)"
+                  >
+                    -
+                  </button>
+                  <button
+                    class="btn-edit-small"
+                    style="
+                      background: var(--text-muted);
+                      color: white;
+                      border: none;
+                    "
+                    onclick="addQuestion('blank', 1)"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nota Líquida e Precisão -->
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: var(--bg-color);
+                padding: 12px 15px;
+                border-radius: 12px;
+                border: 1px solid var(--border-color);
+              "
+            >
+              <div>
+                <div
+                  style="
+                    font-size: 0.75rem;
+                    color: var(--text-muted);
+                    font-weight: 700;
+                    text-transform: uppercase;
+                  "
+                >
+                  Nota Líquida
+                </div>
+                <div
+                  id="q-liquida"
+                  style="
+                    font-weight: 900;
+                    font-size: 1.8rem;
+                    color: var(--primary-color);
+                    line-height: 1.1;
+                  "
+                >
+                  0
+                </div>
+              </div>
+              <div style="text-align: right">
+                <div
+                  style="
+                    font-size: 0.75rem;
+                    color: var(--text-muted);
+                    font-weight: 700;
+                    text-transform: uppercase;
+                  "
+                >
+                  Precisão
+                </div>
+                <div
+                  id="q-accuracy"
+                  style="
+                    font-weight: 900;
+                    font-size: 1.5rem;
+                    color: var(--text-main);
+                    line-height: 1.1;
+                  "
+                >
+                  0%
+                </div>
+              </div>
+            </div>
+
+            <!-- Barra de Precisão -->
+            <div
+              class="progress-track"
+              style="
+                margin-top: 10px;
+                height: 6px;
+                background: rgba(239, 68, 68, 0.15);
+                border-radius: 10px;
+                overflow: hidden;
+                display: flex;
+              "
+            >
+              <div
+                id="q-accuracy-bar"
+                style="
+                  width: 0%;
+                  background: var(--success);
+                  height: 100%;
+                  transition: width 0.5s ease;
+                "
+              ></div>
+            </div>
+          </section>
+
+          <section class="panel-card" style="padding: 1.5rem">
+            <div class="panel-title">
+              <i class="ph-fill ph-list-checks"></i> Registro de Missões (Hoje)
+            </div>
+            <div class="daily-log-list" id="daily-log-list"></div>
+          </section>
+        </div>
+
+        <header class="section-header">
+          <h2>
+            <i
+              class="ph-fill ph-books"
+              style="font-size: 1.8rem; color: var(--primary-color)"
+            ></i>
+            Núcleo Duro (Fase Atual)
+          </h2>
+        </header>
+        <section class="grid-subjects" id="active-subjects"></section>
+
+        <header
+          class="section-header"
+          id="completed-header"
+          style="display: none"
+        >
+          <h2>
+            <i
+              class="ph-fill ph-check-circle"
+              style="font-size: 1.8rem; color: var(--success)"
+            ></i>
+            Disciplinas Concluídas
+          </h2>
+        </header>
+        <section class="grid-subjects" id="completed-subjects"></section>
+
+        <header class="section-header">
+          <h2>
+            <i
+              class="ph-fill ph-hourglass-high"
+              style="font-size: 1.8rem; color: var(--text-muted)"
+            ></i>
+            Fila de Espera
+          </h2>
+          <button
+            class="btn-edit-small"
+            onclick="addSubject()"
+            title="Adicionar nova matéria ao edital"
+            style="
+              width: auto;
+              padding: 0 12px;
+              border-radius: 15px;
+              font-weight: 600;
+            "
+          >
+            <i class="ph-bold ph-plus"></i> Nova Disciplina
+          </button>
+        </header>
+        <section class="waiting-list" id="waiting-subjects"></section>
+      </main>
+    </div>
+    <!-- END APP CONTENT -->
 
     <!-- Modal do Manual Tático -->
     <div
@@ -1786,8 +1957,9 @@
           <h3><i class="ph-fill ph-cloud-check"></i> 5. O Poder da Nuvem</h3>
           <ul>
             <li>
-              Crie uma conta para garantir que nunca perde o seu progresso. Tudo
-              será sincronizado automaticamente.
+              Sua conta garante que nunca perde o seu progresso. Tudo é
+              sincronizado automaticamente e guardado em cache para o modo
+              offline.
             </li>
           </ul>
         </div>
@@ -1867,6 +2039,7 @@
         }
       }
 
+      // MOTOR DE REPARAÇÃO E MIGRAÇÃO DE DADOS AUTOMÁTICA
       const defaultState = {
         lastLogin: new Date().toDateString(),
         dailyCount: 0,
@@ -1947,35 +2120,46 @@
         ],
       };
 
-      window.appState =
-        JSON.parse(localStorage.getItem("prfDashboardState")) || defaultState;
+      function ensureValidState(state) {
+        if (!state || typeof state !== "object")
+          return JSON.parse(JSON.stringify(defaultState));
+        const s = { ...state };
 
-      if (typeof window.appState.dailyGoal === "undefined")
-        window.appState.dailyGoal = 4;
-      if (typeof window.appState.streak === "undefined")
-        window.appState.streak = 0;
-      if (typeof window.appState.pomodorosToday === "undefined")
-        window.appState.pomodorosToday = 0;
-      if (typeof window.appState.dailyLog === "undefined")
-        window.appState.dailyLog = [];
-      if (typeof window.appState.pomodoroSettings === "undefined")
-        window.appState.pomodoroSettings = { study: 50, break: 10 };
-      if (typeof window.appState.weeklyData === "undefined")
-        window.appState.weeklyData = {};
-      if (typeof window.appState.lastBackupReminder === "undefined")
-        window.appState.lastBackupReminder = null;
-      if (typeof window.appState.questions === "undefined")
-        window.appState.questions = { correct: 0, wrong: 0, blank: 0 };
-      if (typeof window.appState.questions.blank === "undefined")
-        window.appState.questions.blank = 0;
+        if (typeof s.dailyGoal !== "number") s.dailyGoal = 4;
+        if (typeof s.streak !== "number") s.streak = 0;
+        if (typeof s.dailyCount !== "number") s.dailyCount = 0;
+        if (typeof s.pomodorosToday !== "number") s.pomodorosToday = 0;
+        if (!Array.isArray(s.dailyLog)) s.dailyLog = [];
+        if (!s.pomodoroSettings) s.pomodoroSettings = { study: 50, break: 10 };
+        if (!s.weeklyData) s.weeklyData = {};
 
-      window.appState.subjects = window.appState.subjects.map((s) => {
-        if (typeof s.id === "undefined")
-          s.id = Math.floor(Math.random() * 10000);
+        if (!s.questions) s.questions = { correct: 0, wrong: 0, blank: 0 };
+        if (typeof s.questions.correct !== "number") s.questions.correct = 0;
+        if (typeof s.questions.wrong !== "number") s.questions.wrong = 0;
+        if (typeof s.questions.blank !== "number") s.questions.blank = 0;
+
+        if (typeof s.lastBackupReminder === "undefined")
+          s.lastBackupReminder = null;
+        if (typeof s.notes !== "string") s.notes = "";
+
+        if (!Array.isArray(s.subjects) || s.subjects.length === 0) {
+          s.subjects = JSON.parse(JSON.stringify(defaultState.subjects));
+        } else {
+          s.subjects = s.subjects.map((sub) => {
+            if (typeof sub.id === "undefined")
+              sub.id = Math.floor(Math.random() * 10000);
+            return sub;
+          });
+        }
         return s;
-      });
-      if (window.appState.subjects.length === 0)
-        window.appState.subjects = defaultState.subjects;
+      }
+
+      // Carregamento inicial super-seguro do LocalStorage
+      let localData = null;
+      try {
+        localData = JSON.parse(localStorage.getItem("prfDashboardState"));
+      } catch (e) {}
+      window.appState = ensureValidState(localData);
 
       function saveData() {
         localStorage.setItem(
@@ -2045,6 +2229,10 @@
 
       // --- CONTROLE DE QUESTÕES (Avançado) ---
       function addQuestion(type, amount) {
+        if (typeof window.appState.questions === "undefined")
+          window.appState.questions = { correct: 0, wrong: 0, blank: 0 };
+        if (typeof window.appState.questions.blank === "undefined")
+          window.appState.questions.blank = 0;
         if (type === "correct") {
           window.appState.questions.correct = Math.max(
             0,
@@ -2086,12 +2274,12 @@
         }
       }
 
-      function openAuthModal() {
-        openModal("auth-modal");
-      }
-      function closeAuthModal(e) {
-        closeModal("auth-modal", e);
-      }
+      window.confirmLogout = function () {
+        if (confirm("Deseja sair e desconectar a conta deste dispositivo?")) {
+          if (typeof window.logoutFirebase === "function")
+            window.logoutFirebase();
+        }
+      };
 
       const htmlDoc = document.documentElement;
 
@@ -2615,9 +2803,7 @@
             type: "bar",
             data: {
               labels: [],
-              datasets: [
-                { data: [], backgroundColor: "#002855", borderRadius: 4 },
-              ],
+              datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }],
             },
             options: {
               responsive: true,
@@ -2631,11 +2817,17 @@
         }
       }
 
+      // ATUALIZAÇÃO 4: Gráfico Dinâmico de Burnout (Sugestão 5)
       function updateWeeklyChart() {
         if (!weeklyChart) return;
         const labels = [];
         const data = [];
+        const bgColors = [];
         const isDark = htmlDoc.getAttribute("data-theme") === "dark";
+        const defaultColor = isDark ? "#3b82f6" : "#002855";
+        const dangerColor = "#ef4444"; // Cor de aviso de Burnout
+        const dailyGoal = window.appState.dailyGoal || 4;
+
         for (let i = 6; i >= 0; i--) {
           const d = new Date();
           d.setDate(d.getDate() - i);
@@ -2645,13 +2837,22 @@
               .toLocaleDateString("pt-BR", { weekday: "short" })
               .replace(".", ""),
           );
-          data.push(window.appState.weeklyData[iso] || 0);
+
+          const val = window.appState.weeklyData[iso] || 0;
+          data.push(val);
+
+          // Lógica de Burnout: Se o utilizador estudar 50% ou mais além da meta, a barra fica vermelha
+          if (val > 0 && val >= dailyGoal * 1.5) {
+            bgColors.push(dangerColor);
+          } else {
+            bgColors.push(defaultColor);
+          }
         }
+
         weeklyChart.data.labels = labels;
         weeklyChart.data.datasets[0].data = data;
-        weeklyChart.data.datasets[0].backgroundColor = isDark
-          ? "#3b82f6"
-          : "#002855";
+        weeklyChart.data.datasets[0].backgroundColor = bgColors;
+
         weeklyChart.options.scales.x = {
           ticks: { color: isDark ? "#94a3b8" : "#64748b" },
           grid: { display: false },
@@ -2704,155 +2905,159 @@
       }
 
       function renderDashboard() {
-        const streakCountEl = document.getElementById("streak-count");
-        if (streakCountEl) streakCountEl.innerText = window.appState.streak;
-        const streakBadgeEl = document.getElementById("streak-badge");
-        if (streakBadgeEl)
-          streakBadgeEl.style.display =
-            window.appState.streak > 0 ? "flex" : "none";
-        const aulasHojeEl = document.getElementById("aulas-hoje");
-        if (aulasHojeEl) aulasHojeEl.innerText = window.appState.dailyCount;
-        const metaTotalEl = document.getElementById("meta-total");
-        if (metaTotalEl)
-          metaTotalEl.innerText = `/${window.appState.dailyGoal}`;
-        const metaFillEl = document.getElementById("meta-fill");
-        if (metaFillEl)
-          metaFillEl.style.width = `${(window.appState.dailyCount / window.appState.dailyGoal) * 100}%`;
+        try {
+          const streakCountEl = document.getElementById("streak-count");
+          if (streakCountEl) streakCountEl.innerText = window.appState.streak;
+          const streakBadgeEl = document.getElementById("streak-badge");
+          if (streakBadgeEl)
+            streakBadgeEl.style.display =
+              window.appState.streak > 0 ? "flex" : "none";
+          const aulasHojeEl = document.getElementById("aulas-hoje");
+          if (aulasHojeEl) aulasHojeEl.innerText = window.appState.dailyCount;
+          const metaTotalEl = document.getElementById("meta-total");
+          if (metaTotalEl)
+            metaTotalEl.innerText = `/${window.appState.dailyGoal}`;
+          const metaFillEl = document.getElementById("meta-fill");
+          if (metaFillEl)
+            metaFillEl.style.width = `${(window.appState.dailyCount / window.appState.dailyGoal) * 100}%`;
 
-        const btnEl = document.getElementById("btn-goal");
-        if (btnEl) {
-          if (window.appState.dailyCount >= window.appState.dailyGoal) {
-            btnEl.disabled = true;
-            btnEl.innerHTML = `<i class="ph-bold ph-check"></i> Missão Cumprida`;
-            btnEl.classList.add("success");
-          } else {
-            btnEl.disabled = false;
-            btnEl.innerHTML = `<i class="ph-bold ph-plus"></i> Registrar Aula`;
-            btnEl.classList.remove("success");
+          const btnEl = document.getElementById("btn-goal");
+          if (btnEl) {
+            if (window.appState.dailyCount >= window.appState.dailyGoal) {
+              btnEl.disabled = true;
+              btnEl.innerHTML = `<i class="ph-bold ph-check"></i> Missão Cumprida`;
+              btnEl.classList.add("success");
+            } else {
+              btnEl.disabled = false;
+              btnEl.innerHTML = `<i class="ph-bold ph-plus"></i> Registrar Aula`;
+              btnEl.classList.remove("success");
+            }
           }
-        }
 
-        const pomodoroMarksEl = document.getElementById("pomodoro-marks");
-        if (pomodoroMarksEl)
-          pomodoroMarksEl.innerText = "🍅 ".repeat(
-            window.appState.pomodorosToday,
-          );
-        const tacticalNotesEl = document.getElementById("tactical-notes");
-        if (tacticalNotesEl && document.activeElement !== tacticalNotesEl)
-          tacticalNotesEl.value = window.appState.notes;
-
-        const qCorrectEl = document.getElementById("q-correct");
-        const qWrongEl = document.getElementById("q-wrong");
-        const qBlankEl = document.getElementById("q-blank");
-        const qLiquidaEl = document.getElementById("q-liquida");
-        const qAccuracyEl = document.getElementById("q-accuracy");
-        const qAccuracyBar = document.getElementById("q-accuracy-bar");
-        const qTotalBadge = document.getElementById("q-total-badge");
-
-        if (qCorrectEl && qWrongEl && qLiquidaEl) {
-          const correct = window.appState.questions.correct || 0;
-          const wrong = window.appState.questions.wrong || 0;
-          const blank = window.appState.questions.blank || 0;
-
-          const totalRespondidas = correct + wrong;
-          const totalGeral = correct + wrong + blank;
-
-          const liquida = correct - wrong;
-          const accuracy =
-            totalRespondidas > 0
-              ? ((correct / totalRespondidas) * 100).toFixed(1)
-              : 0;
-
-          qCorrectEl.innerText = correct;
-          qWrongEl.innerText = wrong;
-          if (qBlankEl) qBlankEl.innerText = blank;
-          if (qTotalBadge) qTotalBadge.innerText = `Total: ${totalGeral}`;
-
-          qLiquidaEl.innerText = liquida;
-          qLiquidaEl.style.color =
-            liquida > 0
-              ? "var(--success)"
-              : liquida < 0
-                ? "var(--danger)"
-                : "var(--text-main)";
-
-          if (qAccuracyEl) qAccuracyEl.innerText = `${accuracy}%`;
-          if (qAccuracyBar) qAccuracyBar.style.width = `${accuracy}%`;
-        }
-
-        const logC = document.getElementById("daily-log-list");
-        if (logC) {
-          logC.innerHTML = "";
-          if (window.appState.dailyLog.length === 0)
-            logC.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px;">Aguardando início das missões...</div>`;
-          else
-            window.appState.dailyLog.forEach(
-              (l) =>
-                (logC.innerHTML += `<div class="log-item"><span class="log-time">${l.time}</span><span>${l.message}</span></div>`),
+          const pomodoroMarksEl = document.getElementById("pomodoro-marks");
+          if (pomodoroMarksEl)
+            pomodoroMarksEl.innerText = "🍅 ".repeat(
+              window.appState.pomodorosToday,
             );
-        }
+          const tacticalNotesEl = document.getElementById("tactical-notes");
+          if (tacticalNotesEl && document.activeElement !== tacticalNotesEl)
+            tacticalNotesEl.value = window.appState.notes;
 
-        const activeC = document.getElementById("active-subjects");
-        const compC = document.getElementById("completed-subjects");
-        if (activeC) activeC.innerHTML = "";
-        if (compC) compC.innerHTML = "";
-        let hasComp = false;
+          const qCorrectEl = document.getElementById("q-correct");
+          const qWrongEl = document.getElementById("q-wrong");
+          const qBlankEl = document.getElementById("q-blank");
+          const qLiquidaEl = document.getElementById("q-liquida");
+          const qAccuracyEl = document.getElementById("q-accuracy");
+          const qAccuracyBar = document.getElementById("q-accuracy-bar");
+          const qTotalBadge = document.getElementById("q-total-badge");
 
-        window.appState.subjects.forEach((sub) => {
-          const p = ((sub.watched / sub.total) * 100).toFixed(1);
-          const isC = sub.watched === sub.total;
-          const html = `
-                <article class="subject-card ${isC ? "completed" : ""}">
-                    <div class="subject-title">
-                        ${sub.name} <i class="ph-bold ph-pencil-simple" style="cursor: pointer; color: var(--text-muted); font-size: 1rem;" onclick="editSubjectTotal(${sub.id})" title="Editar Total de Aulas"></i>
-                    </div>
-                    <div class="subject-stats"><span>Progresso</span><span style="font-weight: 600; color: var(--text-main)">${p}%</span></div>
-                    <div class="progress-track"><div class="progress-fill ${isC ? "completed" : ""}" style="width: ${p}%;"></div></div>
-                    <div class="subject-controls">
-                        <div class="stepper-badge">
-                            <button class="stepper-btn" onclick="updateSubject(${sub.id}, -1)" ${sub.watched === 0 ? "disabled" : ""}><i class="ph-bold ph-minus"></i></button>
-                            <div class="stepper-value">${sub.watched} / ${sub.total}</div>
-                            <button class="stepper-btn" onclick="updateSubject(${sub.id}, 1)" ${isC ? "disabled" : ""}><i class="ph-bold ph-plus"></i></button>
-                        </div>
-                    </div>
-                </article>`;
-          if (isC) {
-            hasComp = true;
-            if (compC) compC.innerHTML += html;
-          } else if (sub.active) {
-            if (activeC) activeC.innerHTML += html;
+          if (qCorrectEl && qWrongEl && qLiquidaEl) {
+            const correct = window.appState.questions.correct || 0;
+            const wrong = window.appState.questions.wrong || 0;
+            const blank = window.appState.questions.blank || 0;
+
+            const totalRespondidas = correct + wrong;
+            const totalGeral = correct + wrong + blank;
+
+            const liquida = correct - wrong;
+            const accuracy =
+              totalRespondidas > 0
+                ? ((correct / totalRespondidas) * 100).toFixed(1)
+                : 0;
+
+            qCorrectEl.innerText = correct;
+            qWrongEl.innerText = wrong;
+            if (qBlankEl) qBlankEl.innerText = blank;
+            if (qTotalBadge) qTotalBadge.innerText = `Total: ${totalGeral}`;
+
+            qLiquidaEl.innerText = liquida;
+            qLiquidaEl.style.color =
+              liquida > 0
+                ? "var(--success)"
+                : liquida < 0
+                  ? "var(--danger)"
+                  : "var(--text-main)";
+
+            if (qAccuracyEl) qAccuracyEl.innerText = `${accuracy}%`;
+            if (qAccuracyBar) qAccuracyBar.style.width = `${accuracy}%`;
           }
-        });
 
-        const completedHeaderEl = document.getElementById("completed-header");
-        if (completedHeaderEl)
-          completedHeaderEl.style.display = hasComp ? "flex" : "none";
+          const logC = document.getElementById("daily-log-list");
+          if (logC) {
+            logC.innerHTML = "";
+            if (window.appState.dailyLog.length === 0)
+              logC.innerHTML = `<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px;">Aguardando início das missões...</div>`;
+            else
+              window.appState.dailyLog.forEach(
+                (l) =>
+                  (logC.innerHTML += `<div class="log-item"><span class="log-time">${l.time}</span><span>${l.message}</span></div>`),
+              );
+          }
 
-        const waitC = document.getElementById("waiting-subjects");
-        if (waitC) {
-          waitC.innerHTML = "";
-          window.appState.subjects
-            .filter((s) => !s.active && s.watched < s.total)
-            .forEach((sub, i) => {
-              waitC.innerHTML += `
-                        <div class="waiting-item" draggable="true" data-id="${sub.id}" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                            <div class="waiting-info">
-                                <div class="waiting-number desktop-drag-handle" title="Clique e arraste"><i class="ph-bold ph-dots-six-vertical"></i></div>
-                                <span style="font-weight: 500">${sub.name} <i class="ph-bold ph-pencil-simple" style="cursor: pointer; color: var(--text-muted); font-size: 0.9rem; margin-left: 5px;" onclick="editSubjectTotal(${sub.id})" title="Editar"></i></span>
-                                <span style="color: var(--text-muted); font-size: 0.9rem;">(${sub.total} aulas)</span>
-                            </div>
-                            <div class="status-badge desktop-drag-handle"><i class="ph-bold ph-arrows-out-line-vertical"></i> Arrastar</div>
-                            <div class="mobile-order-controls">
-                                <button class="mobile-order-btn" onclick="moveSubjectOrder(${sub.id}, -1)" title="Mover para cima"><i class="ph-bold ph-caret-up"></i></button>
-                                <button class="mobile-order-btn" onclick="moveSubjectOrder(${sub.id}, 1)" title="Mover para baixo"><i class="ph-bold ph-caret-down"></i></button>
+          const activeC = document.getElementById("active-subjects");
+          const compC = document.getElementById("completed-subjects");
+          if (activeC) activeC.innerHTML = "";
+          if (compC) compC.innerHTML = "";
+          let hasComp = false;
+
+          window.appState.subjects.forEach((sub) => {
+            const p = ((sub.watched / sub.total) * 100).toFixed(1);
+            const isC = sub.watched === sub.total;
+            const html = `
+                    <article class="subject-card ${isC ? "completed" : ""}">
+                        <div class="subject-title">
+                            ${sub.name} <i class="ph-bold ph-pencil-simple" style="cursor: pointer; color: var(--text-muted); font-size: 1rem;" onclick="editSubjectTotal(${sub.id})" title="Editar Total de Aulas"></i>
+                        </div>
+                        <div class="subject-stats"><span>Progresso</span><span style="font-weight: 600; color: var(--text-main)">${p}%</span></div>
+                        <div class="progress-track"><div class="progress-fill ${isC ? "completed" : ""}" style="width: ${p}%;"></div></div>
+                        <div class="subject-controls">
+                            <div class="stepper-badge">
+                                <button class="stepper-btn" onclick="updateSubject(${sub.id}, -1)" ${sub.watched === 0 ? "disabled" : ""}><i class="ph-bold ph-minus"></i></button>
+                                <div class="stepper-value">${sub.watched} / ${sub.total}</div>
+                                <button class="stepper-btn" onclick="updateSubject(${sub.id}, 1)" ${isC ? "disabled" : ""}><i class="ph-bold ph-plus"></i></button>
                             </div>
                         </div>
-                    `;
-            });
-        }
+                    </article>`;
+            if (isC) {
+              hasComp = true;
+              if (compC) compC.innerHTML += html;
+            } else if (sub.active) {
+              if (activeC) activeC.innerHTML += html;
+            }
+          });
 
-        if (progressChart) updateChartData();
-        updateTimerDisplay();
+          const completedHeaderEl = document.getElementById("completed-header");
+          if (completedHeaderEl)
+            completedHeaderEl.style.display = hasComp ? "flex" : "none";
+
+          const waitC = document.getElementById("waiting-subjects");
+          if (waitC) {
+            waitC.innerHTML = "";
+            window.appState.subjects
+              .filter((s) => !s.active && s.watched < s.total)
+              .forEach((sub, i) => {
+                waitC.innerHTML += `
+                            <div class="waiting-item" draggable="true" data-id="${sub.id}" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                                <div class="waiting-info">
+                                    <div class="waiting-number desktop-drag-handle" title="Clique e arraste"><i class="ph-bold ph-dots-six-vertical"></i></div>
+                                    <span style="font-weight: 500">${sub.name} <i class="ph-bold ph-pencil-simple" style="cursor: pointer; color: var(--text-muted); font-size: 0.9rem; margin-left: 5px;" onclick="editSubjectTotal(${sub.id})" title="Editar"></i></span>
+                                    <span style="color: var(--text-muted); font-size: 0.9rem;">(${sub.total} aulas)</span>
+                                </div>
+                                <div class="status-badge desktop-drag-handle"><i class="ph-bold ph-arrows-out-line-vertical"></i> Arrastar</div>
+                                <div class="mobile-order-controls">
+                                    <button class="mobile-order-btn" onclick="moveSubjectOrder(${sub.id}, -1)" title="Mover para cima"><i class="ph-bold ph-caret-up"></i></button>
+                                    <button class="mobile-order-btn" onclick="moveSubjectOrder(${sub.id}, 1)" title="Mover para baixo"><i class="ph-bold ph-caret-down"></i></button>
+                                </div>
+                            </div>
+                        `;
+              });
+          }
+
+          if (progressChart) updateChartData();
+          updateTimerDisplay();
+        } catch (error) {
+          console.error("Erro na renderização:", error);
+        }
       }
 
       document.addEventListener("keydown", (e) => {
@@ -2883,12 +3088,16 @@
         signInWithEmailAndPassword,
         createUserWithEmailAndPassword,
         signOut,
+        setPersistence,
+        browserLocalPersistence,
       } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      // ATUALIZAÇÃO 3: Importar enableIndexedDbPersistence para Modo Offline
       import {
         getFirestore,
         doc,
         setDoc,
         onSnapshot,
+        enableIndexedDbPersistence,
       } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -2905,16 +3114,26 @@
       const db = getFirestore(app);
       const APP_ID = "prf-agente-administrativo";
 
+      // ATUALIZAÇÃO 3: Ativar Persistência Offline Nativa do Firestore
+      enableIndexedDbPersistence(db).catch((err) => {
+        if (err.code == "failed-precondition") {
+          console.warn(
+            "Múltiplos separadores abertos. Offline funciona apenas num separador.",
+          );
+        } else if (err.code == "unimplemented") {
+          console.warn("O navegador não suporta persistência offline.");
+        }
+      });
+
       let currentUser = null;
       let isSyncing = false;
-      let isAuthInitialized = false;
+      let debounceTimer = null;
 
       function setConnectionStatus(status) {
         const statusBadge = document.getElementById("connection-status");
         const statusText = document.getElementById("connection-text");
         if (!statusBadge || !statusText) return;
 
-        // Limpa os estados anteriores e aplica o novo para o CSS assumir as cores
         statusBadge.classList.remove("online", "offline", "syncing", "local");
         statusBadge.classList.add(status);
 
@@ -2935,149 +3154,130 @@
       window.addEventListener("offline", () => setConnectionStatus("offline"));
       setConnectionStatus(navigator.onLine ? "online" : "offline");
 
-      onAuthStateChanged(auth, async (user) => {
-        const userNameEl = document.getElementById("user-display-name");
-        const authStatusMsg = document.getElementById("auth-status-msg");
-        const btnLogout = document.getElementById("btn-logout");
-        const authFormArea = document.getElementById("auth-form-area");
+      setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+          onAuthStateChanged(auth, async (user) => {
+            const splashScreen = document.getElementById("splash-screen");
+            const loginScreen = document.getElementById("login-screen");
+            const appContent = document.getElementById("app-content");
+            const userNameEl = document.getElementById("user-display-name");
 
-        if (user) {
-          isAuthInitialized = true;
-          currentUser = user;
-          setConnectionStatus(navigator.onLine ? "online" : "offline");
+            if (user) {
+              if (loginScreen) loginScreen.classList.add("hidden");
+              if (appContent) appContent.classList.remove("hidden");
 
-          if (user.isAnonymous) {
-            if (userNameEl) userNameEl.innerText = "Anônimo";
-            if (authStatusMsg)
-              authStatusMsg.innerHTML =
-                "Atualmente você está como <strong>Anônimo</strong>. Faça login ou registe-se para salvar os dados permanentemente.";
-            if (btnLogout) btnLogout.style.display = "none";
-            if (authFormArea) authFormArea.style.display = "block";
-          } else {
-            if (userNameEl) userNameEl.innerText = user.email.split("@")[0];
-            if (authStatusMsg)
-              authStatusMsg.innerHTML = `Sessão iniciada como: <strong>${user.email}</strong>`;
-            if (btnLogout) btnLogout.style.display = "block";
-            if (authFormArea) authFormArea.style.display = "none";
-          }
-
-          try {
-            const userRef = doc(
-              db,
-              "artifacts",
-              APP_ID,
-              "users",
-              user.uid,
-              "state",
-              "current",
-            );
-            onSnapshot(
-              userRef,
-              (snapshot) => {
-                if (snapshot.exists() && !isSyncing) {
-                  const data = snapshot.data();
-                  if (data && data.appState) {
-                    window.appState = data.appState;
-                    localStorage.setItem(
-                      "prfDashboardState",
-                      JSON.stringify(window.appState),
-                    );
-                    window.renderDashboard();
-                  }
-                }
-              },
-              (error) => {
-                console.warn("Firestore Sync Error:", error);
-                setConnectionStatus("local");
-                if (error.code === "permission-denied") {
-                  if (typeof window.showToast === "function")
-                    window.showToast(
-                      "Erro de permissão no Firestore. Verifique as regras da base de dados.",
-                      "danger",
-                    );
-                }
-              },
-            );
-          } catch (e) {
-            console.error(e);
-          }
-        } else {
-          currentUser = null;
-
-          if (!isAuthInitialized) {
-            try {
-              await signInAnonymously(auth);
-            } catch (e) {
-              isAuthInitialized = true;
-              setConnectionStatus("local");
-              if (e.code === "auth/admin-restricted-operation") {
-                console.warn(
-                  "Firebase Auth Error: Login anónimo não ativado. Modo local ativado.",
-                );
+              // ATUALIZAÇÃO 1: Remover Splash Screen suavemente
+              if (splashScreen) {
+                splashScreen.classList.add("hidden");
+                setTimeout(() => splashScreen.remove(), 500); // Remove do DOM após sumir
               }
-              if (userNameEl) userNameEl.innerText = "Offline";
-              if (authStatusMsg)
-                authStatusMsg.innerHTML = "Autenticação falhou. Modo local.";
-              if (btnLogout) btnLogout.style.display = "none";
-              if (authFormArea) authFormArea.style.display = "block";
+
+              currentUser = user;
+              setConnectionStatus(navigator.onLine ? "online" : "offline");
+
+              if (user.isAnonymous) {
+                if (userNameEl) userNameEl.innerText = "Anônimo";
+              } else {
+                let rawName = user.email.split("@")[0];
+                let firstName = rawName.split(/[._-]/)[0];
+                let displayName =
+                  firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
+                if (displayName === "Jeffin") {
+                  displayName = "Jefferson de Araújo Silva";
+                }
+
+                if (userNameEl) userNameEl.innerText = displayName;
+              }
+
+              try {
+                const userRef = doc(
+                  db,
+                  "artifacts",
+                  APP_ID,
+                  "users",
+                  user.uid,
+                  "state",
+                  "current",
+                );
+                onSnapshot(
+                  userRef,
+                  (snapshot) => {
+                    if (snapshot.exists() && !isSyncing) {
+                      const data = snapshot.data();
+                      if (data && data.appState) {
+                        window.appState = ensureValidState(data.appState);
+                        localStorage.setItem(
+                          "prfDashboardState",
+                          JSON.stringify(window.appState),
+                        );
+                        window.renderDashboard();
+                      }
+                    }
+                  },
+                  (error) => {
+                    console.warn("Firestore Sync Error:", error);
+                    setConnectionStatus("local");
+                  },
+                );
+              } catch (e) {
+                console.error(e);
+              }
+            } else {
+              currentUser = null;
+              if (loginScreen) loginScreen.classList.remove("hidden");
+              if (appContent) appContent.classList.add("hidden");
+              if (splashScreen) {
+                splashScreen.classList.add("hidden");
+                setTimeout(() => splashScreen.remove(), 500);
+              }
+              setConnectionStatus("local");
             }
-          } else {
-            if (userNameEl) userNameEl.innerText = "Deslogado";
-            if (authStatusMsg)
-              authStatusMsg.innerHTML =
-                "Faça login para salvar permanentemente o seu progresso na nuvem.";
-            if (btnLogout) btnLogout.style.display = "none";
-            if (authFormArea) authFormArea.style.display = "block";
-            setConnectionStatus("local");
+          });
+        })
+        .catch((err) => console.error("Persistence error:", err));
 
-            try {
-              await signInAnonymously(auth);
-            } catch (err) {} // Tenta restaurar a sessão anónima automaticamente após logout
-          }
-        }
-      });
-
+      // ATUALIZAÇÃO 2: Debounce de 1.5s na Gravação da Nuvem (Proteção de Base de Dados)
       window.saveToFirebase = async function () {
         if (currentUser && navigator.onLine) {
-          isSyncing = true;
           setConnectionStatus("syncing");
-          try {
-            const userRef = doc(
-              db,
-              "artifacts",
-              APP_ID,
-              "users",
-              currentUser.uid,
-              "state",
-              "current",
-            );
-            await setDoc(
-              userRef,
-              { appState: window.appState },
-              { merge: true },
-            );
-            setConnectionStatus("online");
-          } catch (e) {
-            console.warn("Erro ao sincronizar com Firebase:", e.message);
-            setConnectionStatus("local");
-            if (
-              e.code === "permission-denied" &&
-              typeof window.showToast === "function"
-            ) {
-              window.showToast(
-                "Permissão Negada! Verifique as regras do Firestore.",
-                "danger",
+
+          // Limpa o temporizador antigo se existirem cliques rápidos seguidos
+          if (debounceTimer) clearTimeout(debounceTimer);
+
+          // Configura um novo temporizador
+          debounceTimer = setTimeout(async () => {
+            isSyncing = true;
+            try {
+              const userRef = doc(
+                db,
+                "artifacts",
+                APP_ID,
+                "users",
+                currentUser.uid,
+                "state",
+                "current",
               );
+              await setDoc(
+                userRef,
+                { appState: window.appState },
+                { merge: true },
+              );
+              setConnectionStatus("online");
+            } catch (e) {
+              console.warn("Erro ao sincronizar com Firebase:", e.message);
+              setConnectionStatus("local");
+            } finally {
+              isSyncing = false;
             }
-          } finally {
-            isSyncing = false;
-          }
+          }, 1500);
         }
       };
 
-      window.loginWithEmail = async () => {
-        const email = document.getElementById("auth-email").value;
-        const passEl = document.getElementById("auth-password");
+      window.loginWithEmail = async (isModal = false) => {
+        const prefix = isModal ? "modal-" : "";
+        const email = document.getElementById(prefix + "auth-email").value;
+        const passEl = document.getElementById(prefix + "auth-password");
         const pass = passEl.value;
         if (!email || !pass) {
           if (typeof window.showToast === "function")
@@ -3085,14 +3285,11 @@
           return;
         }
 
-        setConnectionStatus("syncing");
         try {
           await signInWithEmailAndPassword(auth, email, pass);
           passEl.value = "";
-          if (typeof window.closeAuthModal === "function")
-            window.closeAuthModal();
           if (typeof window.showToast === "function")
-            window.showToast("Login efetuado com sucesso!", "success");
+            window.showToast("Sessão iniciada!", "success");
         } catch (e) {
           console.error("Erro no login:", e);
           passEl.value = "";
@@ -3101,13 +3298,13 @@
             msg = "E-mail ou senha incorretos.";
           if (typeof window.showToast === "function")
             window.showToast(msg, "danger");
-          setConnectionStatus("offline");
         }
       };
 
-      window.registerWithEmail = async () => {
-        const email = document.getElementById("auth-email").value;
-        const passEl = document.getElementById("auth-password");
+      window.registerWithEmail = async (isModal = false) => {
+        const prefix = isModal ? "modal-" : "";
+        const email = document.getElementById(prefix + "auth-email").value;
+        const passEl = document.getElementById(prefix + "auth-password");
         const pass = passEl.value;
         if (!email || !pass) {
           if (typeof window.showToast === "function")
@@ -3115,7 +3312,6 @@
           return;
         }
 
-        setConnectionStatus("syncing");
         try {
           const currentLocalState = window.appState;
           const userCredential = await createUserWithEmailAndPassword(
@@ -3140,8 +3336,6 @@
             { merge: true },
           );
 
-          if (typeof window.closeAuthModal === "function")
-            window.closeAuthModal();
           if (typeof window.showToast === "function")
             window.showToast("Conta criada e dados migrados!", "success");
         } catch (e) {
@@ -3154,15 +3348,30 @@
             msg = "A senha deve ter pelo menos 6 caracteres.";
           if (typeof window.showToast === "function")
             window.showToast(msg, "danger");
-          setConnectionStatus("offline");
+        }
+      };
+
+      window.loginAnonymously = async () => {
+        try {
+          await signInAnonymously(auth);
+          if (typeof window.showToast === "function")
+            window.showToast(
+              "Sessão iniciada apenas no dispositivo.",
+              "success",
+            );
+        } catch (e) {
+          console.error("Erro no login anónimo:", e);
+          if (typeof window.showToast === "function")
+            window.showToast(
+              "Modo local ativado. Verifique o Firebase.",
+              "danger",
+            );
         }
       };
 
       window.logoutFirebase = async () => {
         try {
           await signOut(auth);
-          if (typeof window.closeAuthModal === "function")
-            window.closeAuthModal();
           if (typeof window.showToast === "function")
             window.showToast("Sessão terminada.", "success");
         } catch (e) {
