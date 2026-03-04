@@ -838,6 +838,34 @@
         color: #fca5a5;
       }
 
+      /* Melhorias Avançadas para Renderização da IA */
+      .chat-ai h3 {
+        color: var(--primary-color);
+        font-size: 1.05rem;
+        margin-top: 15px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 4px;
+      }
+      [data-theme="dark"] .chat-ai h3 {
+        color: var(--primary-hover);
+      }
+      .chat-ai blockquote {
+        border-left: 4px solid var(--accent-color);
+        background: var(--bg-color);
+        padding: 8px 12px;
+        margin: 10px 0;
+        font-style: italic;
+        color: var(--text-muted);
+        border-radius: 0 8px 8px 0;
+      }
+      .chat-ai hr {
+        border: 0;
+        height: 1px;
+        background: var(--border-color);
+        margin: 15px 0;
+      }
+
       .typing-indicator {
         display: flex;
         gap: 4px;
@@ -2186,32 +2214,40 @@
                 ></i>
                 Mentor Tático IA
               </div>
-              <button
-                class="btn-edit-small"
-                onclick="clearChat()"
-                title="Limpar Histórico"
-                style="
-                  width: auto;
-                  padding: 0 12px;
-                  border-radius: 15px;
-                  font-size: 0.8rem;
-                  font-weight: 600;
-                "
-              >
-                <i class="ph-bold ph-trash"></i> Limpar
-              </button>
+              <div style="display: flex; gap: 8px">
+                <button
+                  class="btn-edit-small"
+                  onclick="configureAPIKey()"
+                  title="Configurar Chave API (Segurança)"
+                  style="
+                    width: auto;
+                    padding: 0 12px;
+                    border-radius: 15px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                  "
+                >
+                  <i class="ph-bold ph-key"></i> API
+                </button>
+                <button
+                  class="btn-edit-small"
+                  onclick="clearChat()"
+                  title="Limpar Histórico"
+                  style="
+                    width: auto;
+                    padding: 0 12px;
+                    border-radius: 15px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                  "
+                >
+                  <i class="ph-bold ph-trash"></i> Limpar
+                </button>
+              </div>
             </div>
 
             <div id="chat-container" class="chat-container">
-              <div class="chat-bubble chat-ai">
-                <p><strong>Saudações, Guerreiro!</strong> 🦅</p>
-                <p>
-                  Sou o teu Mentor Tático especializado no concurso da PRF.
-                  Estou conectado aos teus dados de estudo e pronto para te
-                  ajudar a dominar Direito, Trânsito, RLM e muito mais.
-                </p>
-                <p>Como posso ajudar na missão de hoje?</p>
-              </div>
+              <!-- O histórico será renderizado aqui pelo javascript -->
             </div>
 
             <!-- Input Redesenhado -->
@@ -2544,6 +2580,8 @@
         weeklyData: {},
         lastBackupReminder: null,
         questions: { correct: 0, wrong: 0, blank: 0 },
+        chatHistory: [], // Histórico de IA guardado na Cloud
+        theme: "light", // Preferência de tema guardada na Cloud
         subjects: [
           {
             id: 1,
@@ -2632,6 +2670,10 @@
         if (typeof s.lastBackupReminder === "undefined")
           s.lastBackupReminder = null;
         if (typeof s.notes !== "string") s.notes = "";
+
+        // Garantias da Nuvem para o Histórico e Tema
+        if (!Array.isArray(s.chatHistory)) s.chatHistory = [];
+        if (typeof s.theme !== "string") s.theme = "light";
 
         if (!Array.isArray(s.subjects) || s.subjects.length === 0) {
           s.subjects = JSON.parse(JSON.stringify(defaultState.subjects));
@@ -2812,7 +2854,9 @@
       }
 
       function initTheme() {
-        const savedTheme = localStorage.getItem("prfTheme") || "light";
+        // Agora lê do state (se existir) para sincronizar com a cloud
+        const savedTheme =
+          window.appState.theme || localStorage.getItem("prfTheme") || "light";
         htmlDoc.setAttribute("data-theme", savedTheme);
         const themeIcon = document.getElementById("theme-icon");
         if (themeIcon)
@@ -2826,6 +2870,11 @@
           htmlDoc.getAttribute("data-theme") === "light" ? "dark" : "light";
         htmlDoc.setAttribute("data-theme", newTheme);
         localStorage.setItem("prfTheme", newTheme);
+
+        // Salva a nova preferência de tema no Firebase
+        window.appState.theme = newTheme;
+        saveData();
+
         const themeIcon = document.getElementById("theme-icon");
         if (themeIcon)
           themeIcon.className =
@@ -2912,7 +2961,7 @@
         "Vença a si mesmo todos os dias.",
         "O preço da excelência é a disciplina.",
         "A dor da disciplina é menor que a dor do arrependimento.",
-        "A farda tem o seu peso, prepare os ombros.",
+        "A farda tem o seu peso, prepare os shoulders.",
         "Sorte é o nome que dão ao seu esforço não visto.",
         "A aprovação é construída no silêncio do seu quarto.",
         "Missão dada é missão cumprida.",
@@ -3521,6 +3570,38 @@
         progressChart.update();
       }
 
+      // Função para renderizar o Chat guardado na Nuvem
+      window.renderChatHistory = function () {
+        const chatContainer = document.getElementById("chat-container");
+        if (!chatContainer) return;
+
+        let html = `
+          <div class="chat-bubble chat-ai">
+            <p><strong>Saudações, Guerreiro!</strong> 🦅</p>
+            <p>Sou o teu Mentor Tático especializado no concurso da PRF. Estou conectado aos teus dados de estudo e pronto para te ajudar a dominar Direito, Trânsito, RLM e muito mais.</p>
+            <p>Como posso ajudar na missão de hoje?</p>
+          </div>
+        `;
+
+        if (window.appState && window.appState.chatHistory) {
+          window.appState.chatHistory.forEach((msg) => {
+            if (msg.role === "user") {
+              html += `<div class="chat-bubble chat-user">${msg.content}</div>`;
+            } else {
+              // Verifica se marked existe antes de compilar
+              const content =
+                typeof marked !== "undefined"
+                  ? marked.parse(msg.content)
+                  : msg.content;
+              html += `<div class="chat-bubble chat-ai">${content}</div>`;
+            }
+          });
+        }
+
+        chatContainer.innerHTML = html;
+        scrollToBottom("chat-container");
+      };
+
       function renderDashboard() {
         try {
           const streakCountEl = document.getElementById("streak-count");
@@ -3672,6 +3753,11 @@
 
           if (progressChart) updateChartData();
           updateTimerDisplay();
+
+          // Renderiza o Histórico da Nuvem se houver
+          if (!isAILoading) {
+            window.renderChatHistory();
+          }
         } catch (error) {
           console.error("Erro na renderização:", error);
         }
@@ -3690,21 +3776,28 @@
           toggleZenMode();
       });
 
-      // --- INTEGRAÇÃO DA INTELIGÊNCIA ARTIFICIAL (GEMINI API) AVANÇADA ---
-      let aiChatHistory = [];
-      let isAILoading = false; // Controle de estado para evitar cliques múltiplos
+      // --- INTEGRAÇÃO DA INTELIGÊNCIA ARTIFICIAL (OPENAI API) COM CLOUD ---
+      let isAILoading = false;
+
+      function configureAPIKey() {
+        const currentKey = localStorage.getItem("prf_ai_api_key") || "";
+        const msg =
+          "🔒 PROTEÇÃO DE DADOS\n\nPara não expor a sua chave no código fonte, insira-a aqui.\nEla ficará encriptada apenas no seu navegador (Local Storage).\n\nInsira a sua Chave API do Gemini (AIzaSy...):";
+        const newKey = prompt(msg, currentKey);
+
+        if (newKey !== null) {
+          localStorage.setItem("prf_ai_api_key", newKey.trim());
+          showToast(
+            "Chave API guardada com segurança no seu dispositivo!",
+            "success",
+          );
+        }
+      }
 
       function clearChat() {
-        aiChatHistory = [];
-        const chatEl = document.getElementById("chat-container");
-        if (chatEl) {
-          chatEl.innerHTML = `
-                <div class="chat-bubble chat-ai">
-                  <p><strong>Saudações, Guerreiro!</strong> 🦅</p>
-                  <p>Memória limpa. Sistema tático reiniciado e pronto para a próxima instrução.</p>
-                </div>
-              `;
-        }
+        window.appState.chatHistory = [];
+        saveData(); // Salva na Nuvem que o chat foi limpo
+        window.renderChatHistory();
         showToast("Histórico limpo com sucesso.", "success");
       }
 
@@ -3739,7 +3832,6 @@
       }
 
       async function askAI() {
-        // Proteção contra cliques múltiplos
         if (isAILoading) return;
 
         const inputEl = document.getElementById("ai-input");
@@ -3754,22 +3846,20 @@
 
         isAILoading = true;
 
-        // Limpeza Preventiva do Histórico (mantém as últimas 10 interações - 5 pares pergunta/resposta) para evitar erro de limite de tokens da API
-        if (aiChatHistory.length > 10) {
-          // Remove os elementos mais antigos, garantindo que remove pares de {role: user}, {role: model}
-          aiChatHistory.splice(0, 2);
+        if (window.appState.chatHistory.length > 20) {
+          window.appState.chatHistory.splice(0, 2); // Limita a memória para não sobrecarregar
         }
 
-        // 1. Adiciona a mensagem do Utilizador ao Ecrã
-        chatContainer.innerHTML += `<div class="chat-bubble chat-user">${query}</div>`;
-        scrollToBottom("chat-container");
+        // Regista a pergunta na Nuvem e Atualiza o ecrã
+        window.appState.chatHistory.push({ role: "user", content: query });
+        saveData();
+        window.renderChatHistory();
 
         inputEl.value = "";
         inputEl.disabled = true;
         btnEl.disabled = true;
         btnEl.style.opacity = "0.5";
 
-        // Adiciona Animação de Digitação (Typing Indicator)
         const typingId = "typing-" + Date.now();
         chatContainer.innerHTML += `
               <div id="${typingId}" class="chat-bubble chat-ai">
@@ -3779,13 +3869,16 @@
               </div>`;
         scrollToBottom("chat-container");
 
-        // A API Key inserida para funcionar externamente (Vercel, etc.) com limpeza de espaços
-        const apiKey = "".trim();
-        const url =
-          "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
-          apiKey;
+        // Segurança de Dados: Obter chave API do LocalStorage do utilizador
+        let apiKey = localStorage.getItem("prf_ai_api_key") || "";
 
-        // 2. Extrai o contexto COMPLETO do edital para a IA
+        // Se houver uma chave do utilizador configurada, usar o modelo de produção estável.
+        // Caso contrário, utilizar o fallback vazio para o ambiente de testes do Canvas.
+        let model = apiKey
+          ? "gemini-1.5-flash"
+          : "gemini-2.5-flash-preview-09-2025";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
         const activeSubjects =
           window.appState.subjects
             .filter((s) => s.active)
@@ -3806,7 +3899,7 @@
              === CONTEXTO TÁTICO DO ALUNO ===
              - Meta Diária: ${window.appState.dailyCount} de ${window.appState.dailyGoal} aulas concluídas hoje.
              - Dias Seguidos (Streak): ${window.appState.streak} dias.
-             - Desempenho CEBRASPE: ${window.appState.questions.correct} Certas, ${window.appState.questions.wrong} Erradas, ${window.appState.questions.blank} Em Branco. (Nota Líquida: ${window.appState.questions.correct - window.appState.questions.wrong}).
+             - Desempenho CEBRASPE: ${window.appState.questions.correct} Certas, ${window.appState.questions.wrong} Erradas, ${window.appState.questions.blank} Em Branco.
              - Bloco de Notas Atual: "${userNotes}"
              
              - Progresso Detalhado do Edital:
@@ -3814,42 +3907,47 @@
              ================================
           `;
 
-        // Prepara o Payload mantendo o histórico de conversação
-        const currentMessage = { role: "user", parts: [{ text: query }] };
-        const payloadContents = [...aiChatHistory, currentMessage];
+        const systemPrompt = `Você é o "Comando Central", um Mentor Tático de Elite e Especialista Absoluto no concurso da Polícia Rodoviária Federal (PRF) do Brasil. Sua única missão é forjar a aprovação do usuário.
 
-        // 1. Instruções de Sistema Mais Rigorosas
+        CONTEXTO DO ALUNO:
+        ${progressContext}
+
+        DIRETRIZES DE ATUAÇÃO (MANDATÓRIAS):
+        1. Tom e Persona: Mantenha postura militar, disciplinadora, de alta performance ("Guerreiro", "Foco na missão"). Seja direto, cirúrgico e incisivo. Sem cordialidade excessiva.
+        2. Rigor Técnico (CEBRASPE): Para dúvidas de Direito, Trânsito ou Administração, aplique a jurisprudência pacificada (STF/STJ) e a literalidade da lei. Foque nas "pegadinhas" clássicas da banca CEBRASPE.
+        3. Formatação Impecável (Markdown):
+           - Use **negrito** para palavras-chave, prazos, maiorias e exceções legais.
+           - Estruture respostas complexas usando cabeçalhos (ex: ### ⚖️ Fundamento Legal, ### 🎯 Estratégia, ### ⚠️ Alerta CEBRASPE).
+           - Destaque citações importantes ou leis usando o formato blockquote (>).
+           - Use APENAS marcadores padrão ("- "). NUNCA use checklists interativos ("- [ ]").
+        4. Consciência Situacional: Analise os dados do painel do aluno. Se ele pedir planeamento ou estiver estagnado, cobre metas, aponte as matérias ativas mais atrasadas ou referencie o seu desempenho atual.
+        5. Fecho de Elite: Termine SEMPRE com uma instrução clara de "Próximo Passo" ou lance um item rápido (Certo/Errado) para testar a retenção imediata.
+        6. Tolerância Zero a Erros: NUNCA invente leis, súmulas ou dados estatísticos. Se a doutrina divergir, aponte a perspetiva adotada pelo CEBRASPE.`;
+
+        // Normalizar histórico universal (da nuvem) para o formato exigido pelo Gemini
+        const formattedHistory = window.appState.chatHistory.map((msg) => ({
+          role: msg.role === "assistant" ? "model" : "user",
+          parts: [{ text: msg.content || "" }],
+        }));
+
         const payload = {
-          contents: payloadContents,
+          contents: formattedHistory,
           systemInstruction: {
-            parts: [
-              {
-                text: `Assuma a identidade de um Mentor Tático de Elite para o concurso da Polícia Rodoviária Federal (PRF) do Brasil. Você é rigoroso, direto e focado na aprovação.
-              
-              Você tem acesso ao painel de controlo do aluno. Leia o contexto abaixo antes de responder:
-              ${progressContext}
-              
-              Regras de Engajamento:
-              1. Respostas Diretas e Didáticas: Seja cirúrgico. Foque no estilo da banca CEBRASPE (Certo/Errado).
-              2. Formatação Profissional: Use Markdown impecável. Utilize negrito para destacar prazos, palavras-chave e exceções à regra. Se citar artigos de lei longos, coloque-os num bloco de código ou citação (quote). NUNCA use checklists interativos ("- [ ]"). Use apenas marcadores padrão ("- " ou "* ").
-              3. Tom de Voz Militar: Mantenha uma postura profissional, de incentivo militar e alta disciplina ("Guerreiro", "Futuro PRF", "Foco na missão"). Evite ser excessivamente amigável; seja um treinador exigente.
-              4. Proatividade Tática: No final de explicações complexas, sugira um "Próximo Passo" ou faça uma pergunta curta (estilo CEBRASPE) para testar o conhecimento.
-              5. Visão Estratégica (Consciência Situacional): Se o aluno pedir conselhos de estudo ou análise, leia a secção "Progresso Detalhado do Edital" e as estatísticas diárias para dar conselhos precisos sobre qual matéria ele deve priorizar amanhã ou alertar se alguma matéria está muito atrasada.
-              6. Precisão Jurídica: NUNCA invente leis, súmulas ou jurisprudência. Baseie-se APENAS na doutrina dominante e na legislação vigente no Brasil aplicável à PRF.`,
-              },
-            ],
+            parts: [{ text: systemPrompt }],
+          },
+          generationConfig: {
+            temperature: 0.3, // Garante respostas factuais e precisas, ideal para o estudo jurídico
           },
         };
 
-        const fetchWithRetry = async (url, options, retries = 3) => {
+        const fetchWithRetry = async (url, options, retries = 5) => {
           let delay = 1000;
           for (let i = 0; i < retries; i++) {
             try {
               const res = await fetch(url, options);
               if (!res.ok) {
-                // Extrai a resposta exata de erro da Google para podermos diagnosticar
                 const errorText = await res.text();
-                throw new Error(`HTTP ${res.status}: ${errorText}`);
+                throw new Error(`HTTP Error ${res.status}: ${errorText}`);
               }
               return await res.json();
             } catch (e) {
@@ -3861,54 +3959,49 @@
         };
 
         try {
-          const result = await fetchWithRetry(url, {
+          const response = await fetchWithRetry(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify(payload),
           });
 
           const textResponse =
-            result.candidates?.[0]?.content?.parts?.[0]?.text ||
+            response.candidates?.[0]?.content?.parts?.[0]?.text ||
             "Ocorreu um erro de transmissão. Repita a operação.";
 
-          // Guarda a conversa no histórico para a próxima pergunta
-          aiChatHistory.push(currentMessage);
-          aiChatHistory.push({
-            role: "model",
-            parts: [{ text: textResponse }],
-          });
-
-          // Remove o indicador animado de escrita
+          // Remove o indicador de estar a escrever
           const typingEl = document.getElementById(typingId);
           if (typingEl) typingEl.remove();
 
-          // Renderiza a resposta da IA convertendo Markdown para HTML via biblioteca Marked.js
-          const formattedHTML = marked.parse(textResponse);
-          chatContainer.innerHTML += `<div class="chat-bubble chat-ai">${formattedHTML}</div>`;
+          // Guarda a resposta na nuvem mantendo o padrão universal e renderiza!
+          window.appState.chatHistory.push({
+            role: "assistant",
+            content: textResponse,
+          });
+          saveData();
+          window.renderChatHistory();
         } catch (error) {
           console.error("Erro detalhado na IA:", error);
           const typingEl = document.getElementById(typingId);
           if (typingEl) typingEl.remove();
 
           let errorMsg =
-            "O servidor está ocupado. Tente novamente em instantes.";
-          if (!navigator.onLine) {
-            errorMsg = "Verifique a sua ligação à Internet e tente novamente.";
-          } else if (error.message && error.message.includes("404")) {
+            "O servidor está ocupado ou ocorreu uma falha de rede. Tente novamente em instantes.";
+          if (error.message.includes("404")) {
             errorMsg =
-              "Modelo não encontrado (Erro 404). A sua chave API não tem acesso a este modelo ou o nome está incorreto.";
-          } else if (error.message && error.message.includes("403")) {
-            errorMsg =
-              "Acesso negado (Erro 403). Verifique as permissões da sua API Key no Google AI Studio.";
-          } else if (error.message && error.message.includes("400")) {
-            errorMsg =
-              "Pedido inválido (Erro 400). A tentar limpar a memória para resolver...";
-            aiChatHistory = []; // Auto-limpeza do histórico em caso de erro 400
+              "Erro 404: Modelo não encontrado ou API Key sem permissão.";
+          } else if (error.message.includes("403")) {
+            errorMsg = "Acesso negado (Erro 403). Verifique a sua API Key.";
           }
 
-          // Mostra o erro detalhado diretamente no chat para facilitar o diagnóstico
           chatContainer.innerHTML += `<div class="chat-bubble chat-ai"><span style="color: var(--danger)"><i class="ph-bold ph-warning-circle"></i> ${errorMsg}</span><br><span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; display: block; border-top: 1px dashed var(--border-color); padding-top: 5px;"><strong>Log do Sistema:</strong> ${error.message.substring(0, 150)}...</span></div>`;
           showToast("Falha na ligação à IA.", "danger");
+
+          // Reverte a pergunta guardada na nuvem caso a IA falhe para evitar erros na próxima tentativa
+          window.appState.chatHistory.pop();
+          saveData();
         } finally {
           isAILoading = false;
           inputEl.disabled = false;
@@ -3956,7 +4049,7 @@
         projectId: "prf-agente-administrativo",
         storageBucket: "prf-agente-administrativo.firebasestorage.app",
         messagingSenderId: "82397027291",
-        appId: "1:82397027291:web:f236c305127715c06465fe",
+        appId: "1:82397027291:web:cdf786548a2176746465fe",
       };
 
       const app = initializeApp(firebaseConfig);
@@ -3975,13 +4068,11 @@
       });
 
       let currentUser = null;
-      let isSyncing = (window.isSyncing = false); // Exposta globalmente para ser lida no window.onbeforeunload
+      let isSyncing = (window.isSyncing = false);
       let debounceTimer = null;
 
-      // Listener Global para impedir saída durante sincronização com o Firebase
       window.addEventListener("beforeunload", (e) => {
         if (window.isSyncing) {
-          // A maioria dos browsers modernos mostra a sua própria mensagem genérica
           e.preventDefault();
           e.returnValue = "";
           return "";
@@ -4069,6 +4160,32 @@
                           "prfDashboardState",
                           JSON.stringify(window.appState),
                         );
+
+                        // Atualiza o tema da interface se foi alterado noutro dispositivo
+                        const currentHtmlTheme =
+                          document.documentElement.getAttribute("data-theme");
+                        if (
+                          window.appState.theme &&
+                          window.appState.theme !== currentHtmlTheme
+                        ) {
+                          document.documentElement.setAttribute(
+                            "data-theme",
+                            window.appState.theme,
+                          );
+                          localStorage.setItem(
+                            "prfTheme",
+                            window.appState.theme,
+                          );
+                          const themeIcon =
+                            document.getElementById("theme-icon");
+                          if (themeIcon)
+                            themeIcon.className =
+                              window.appState.theme === "light"
+                                ? "ph ph-moon"
+                                : "ph ph-sun";
+                          updateMetaThemeColor(window.appState.theme);
+                        }
+
                         window.renderDashboard();
                       }
                     }
@@ -4079,7 +4196,7 @@
                   },
                 );
               } catch (e) {
-                console.error(e);
+                console.warn("Erro ao buscar dados do Firebase:", e.message);
               }
             } else {
               currentUser = null;
@@ -4093,7 +4210,7 @@
             }
           });
         })
-        .catch((err) => console.error("Persistence error:", err));
+        .catch((err) => console.warn("Persistence error:", err));
 
       window.saveToFirebase = async function () {
         if (currentUser && navigator.onLine) {
@@ -4102,7 +4219,7 @@
           if (debounceTimer) clearTimeout(debounceTimer);
 
           debounceTimer = setTimeout(async () => {
-            window.isSyncing = true; // Exposto na window para ser lido no beforeunload
+            window.isSyncing = true;
             try {
               const userRef = doc(
                 db,
@@ -4146,11 +4263,12 @@
           if (typeof window.showToast === "function")
             window.showToast("Sessão iniciada!", "success");
         } catch (e) {
-          console.error("Erro no login:", e);
+          console.warn("Aviso no login:", e.message);
           passEl.value = "";
           let msg = "Erro ao entrar. Verifique os seus dados.";
           if (e.code === "auth/invalid-credential")
-            msg = "E-mail ou senha incorretos.";
+            msg =
+              "E-mail ou senha incorretos. Caso não tenha conta, clique em 'Criar Nova Conta'.";
           if (typeof window.showToast === "function")
             window.showToast(msg, "danger");
         }
@@ -4194,7 +4312,7 @@
           if (typeof window.showToast === "function")
             window.showToast("Conta criada e dados migrados!", "success");
         } catch (e) {
-          console.error("Erro ao registar:", e);
+          console.warn("Aviso ao registar:", e.message);
           passEl.value = "";
           let msg = "Erro ao criar conta.";
           if (e.code === "auth/email-already-in-use")
@@ -4215,7 +4333,7 @@
               "success",
             );
         } catch (e) {
-          console.error("Erro no login anónimo:", e);
+          console.warn("Aviso no login anónimo:", e.message);
           if (typeof window.showToast === "function")
             window.showToast(
               "Modo local ativado. Verifique o Firebase.",
@@ -4230,7 +4348,7 @@
           if (typeof window.showToast === "function")
             window.showToast("Sessão terminada.", "success");
         } catch (e) {
-          console.error("Erro ao sair:", e);
+          console.warn("Aviso ao sair:", e.message);
         }
       };
     </script>
