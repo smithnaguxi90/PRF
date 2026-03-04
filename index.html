@@ -3779,9 +3779,11 @@
               </div>`;
         scrollToBottom("chat-container");
 
-        // A API Key inserida para funcionar externamente (Vercel, etc.)
-        const apiKey = "AIzaSyDJDJzn5kGQ2tnQErziK_OS5YFKUVWtU8o";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        // A API Key inserida para funcionar externamente (Vercel, etc.) com limpeza de espaços
+        const apiKey = "".trim();
+        const url =
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
+          apiKey;
 
         // 2. Extrai o contexto COMPLETO do edital para a IA
         const activeSubjects =
@@ -3839,12 +3841,16 @@
           },
         };
 
-        const fetchWithRetry = async (url, options, retries = 5) => {
+        const fetchWithRetry = async (url, options, retries = 3) => {
           let delay = 1000;
           for (let i = 0; i < retries; i++) {
             try {
               const res = await fetch(url, options);
-              if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+              if (!res.ok) {
+                // Extrai a resposta exata de erro da Google para podermos diagnosticar
+                const errorText = await res.text();
+                throw new Error(`HTTP ${res.status}: ${errorText}`);
+              }
               return await res.json();
             } catch (e) {
               if (i === retries - 1) throw e;
@@ -3879,9 +3885,8 @@
           // Renderiza a resposta da IA convertendo Markdown para HTML via biblioteca Marked.js
           const formattedHTML = marked.parse(textResponse);
           chatContainer.innerHTML += `<div class="chat-bubble chat-ai">${formattedHTML}</div>`;
-          // O scroll desce automaticamente graças ao MutationObserver
         } catch (error) {
-          console.error("Erro na IA:", error);
+          console.error("Erro detalhado na IA:", error);
           const typingEl = document.getElementById(typingId);
           if (typingEl) typingEl.remove();
 
@@ -3891,10 +3896,18 @@
             errorMsg = "Verifique a sua ligação à Internet e tente novamente.";
           } else if (error.message && error.message.includes("404")) {
             errorMsg =
-              "Serviço não encontrado (Erro 404). Verifique a configuração da sua API.";
+              "Modelo não encontrado (Erro 404). A sua chave API não tem acesso a este modelo ou o nome está incorreto.";
+          } else if (error.message && error.message.includes("403")) {
+            errorMsg =
+              "Acesso negado (Erro 403). Verifique as permissões da sua API Key no Google AI Studio.";
+          } else if (error.message && error.message.includes("400")) {
+            errorMsg =
+              "Pedido inválido (Erro 400). A tentar limpar a memória para resolver...";
+            aiChatHistory = []; // Auto-limpeza do histórico em caso de erro 400
           }
 
-          chatContainer.innerHTML += `<div class="chat-bubble chat-ai"><span style="color: var(--danger)"><i class="ph-bold ph-warning-circle"></i> ${errorMsg}</span></div>`;
+          // Mostra o erro detalhado diretamente no chat para facilitar o diagnóstico
+          chatContainer.innerHTML += `<div class="chat-bubble chat-ai"><span style="color: var(--danger)"><i class="ph-bold ph-warning-circle"></i> ${errorMsg}</span><br><span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; display: block; border-top: 1px dashed var(--border-color); padding-top: 5px;"><strong>Log do Sistema:</strong> ${error.message.substring(0, 150)}...</span></div>`;
           showToast("Falha na ligação à IA.", "danger");
         } finally {
           isAILoading = false;
@@ -3902,6 +3915,7 @@
           btnEl.disabled = false;
           btnEl.style.opacity = "1";
           inputEl.focus();
+          scrollToBottom("chat-container");
         }
       }
 
