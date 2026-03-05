@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Painel de Estudos | PRF Administrativo</title>
+    <title>Comando Central | PRF Administrativo</title>
 
     <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -770,16 +770,6 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
-        width: 100%;
-      }
-
-      /* Grelha do Simulador CEBRASPE */
-      .cebraspe-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-bottom: 1.5rem;
-        text-align: center;
         width: 100%;
       }
 
@@ -2917,7 +2907,7 @@
         if (timerDisplayEl) timerDisplayEl.innerText = t;
         document.title = isTimerRunning
           ? `(${t}) Foco PRF`
-          : "Painel de Estudos | PRF Administrativo";
+          : "Comando Central | PRF Administrativo";
         const btnModeStudy = document.getElementById("btn-mode-study");
         if (btnModeStudy)
           btnModeStudy.innerText = `Estudo (${window.appState.pomodoroSettings.study}m)`;
