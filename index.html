@@ -29,8 +29,6 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Adicionado script oficial para renderizar textos complexos (Markdown) da IA -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
       :root {
@@ -73,7 +71,6 @@
         padding: 0;
         box-sizing: border-box;
         font-family: "Inter", sans-serif;
-        /* Transições Suaves Aprimoradas */
         transition:
           background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
           color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -737,214 +734,12 @@
         min-width: 45px;
       }
 
-      /* --- UI DO CHAT IA AVANÇADO --- */
-      .chat-container {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        height: 350px;
-        overflow-y: auto;
-        padding: 15px;
-        background: var(--bg-color);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-md);
-        margin-bottom: 10px;
-        scroll-behavior: smooth;
-      }
-      .chat-container::-webkit-scrollbar {
-        width: 6px;
-      }
-      .chat-container::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      .chat-container::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: 4px;
-      }
-
-      .chat-bubble {
-        max-width: 85%;
-        padding: 12px 16px;
-        border-radius: 12px;
-        font-size: 0.95rem;
-        line-height: 1.5;
-        animation: fadeIn 0.3s ease;
-        word-wrap: break-word;
-      }
-      .chat-user {
-        align-self: flex-end;
-        background: var(--primary-color);
-        color: white;
-        border-bottom-right-radius: 2px;
-        box-shadow: var(--shadow-sm);
-      }
-      .chat-ai {
-        align-self: flex-start;
-        background: var(--surface-color);
-        color: var(--text-main);
-        border: 1px solid var(--border-color);
-        border-bottom-left-radius: 2px;
-        box-shadow: var(--shadow-sm);
-      }
-
-      /* Estilos para a formatação do texto da IA */
-      .chat-ai p {
-        margin-bottom: 10px;
-      }
-      .chat-ai p:last-child {
-        margin-bottom: 0;
-      }
-      .chat-ai ul,
-      .chat-ai ol {
-        padding-left: 20px;
-        margin-bottom: 10px;
-      }
-      .chat-ai li {
-        margin-bottom: 5px;
-      }
-      .chat-ai strong {
-        color: var(--primary-color);
-        font-weight: 800;
-      }
-      [data-theme="dark"] .chat-ai strong {
-        color: var(--primary-hover);
-      }
-
-      /* Novos Estilos para Citações e Leis (Markdown) */
-      .chat-ai pre {
-        background: rgba(0, 40, 85, 0.05);
-        padding: 10px;
-        border-radius: 8px;
-        border-left: 3px solid var(--accent-color);
-        overflow-x: auto;
-        margin-bottom: 10px;
-        font-family: monospace;
-        font-size: 0.85rem;
-      }
-      [data-theme="dark"] .chat-ai pre {
-        background: rgba(59, 130, 246, 0.1);
-        border-left-color: var(--primary-hover);
-      }
-      .chat-ai code {
-        background: rgba(0, 0, 0, 0.05);
-        padding: 2px 4px;
-        border-radius: 4px;
-        font-family: monospace;
-        font-size: 0.85rem;
-        color: var(--danger);
-      }
-      [data-theme="dark"] .chat-ai code {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fca5a5;
-      }
-
-      /* Melhorias Avançadas para Renderização da IA */
-      .chat-ai h3 {
-        color: var(--primary-color);
-        font-size: 1.05rem;
-        margin-top: 15px;
-        margin-bottom: 8px;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 4px;
-      }
-      [data-theme="dark"] .chat-ai h3 {
-        color: var(--primary-hover);
-      }
-      .chat-ai blockquote {
-        border-left: 4px solid var(--accent-color);
-        background: var(--bg-color);
-        padding: 8px 12px;
-        margin: 10px 0;
-        font-style: italic;
-        color: var(--text-muted);
-        border-radius: 0 8px 8px 0;
-      }
-      .chat-ai hr {
-        border: 0;
-        height: 1px;
-        background: var(--border-color);
-        margin: 15px 0;
-      }
-
-      .typing-indicator {
-        display: flex;
-        gap: 4px;
-        align-items: center;
-        justify-content: center;
-        height: 24px;
-      }
-      .typing-dot {
-        width: 6px;
-        height: 6px;
-        background: var(--text-muted);
-        border-radius: 50%;
-        animation: blink 1.4s infinite both;
-      }
-      .typing-dot:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .typing-dot:nth-child(3) {
-        animation-delay: 0.4s;
-      }
-      @keyframes blink {
-        0% {
-          opacity: 0.2;
-        }
-        20% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0.2;
-        }
-      }
-
       /* Nova animação de carregamento visual para botões */
       .btn-saving {
         animation: pulse 0.5s ease-in-out;
         background-color: var(--success) !important;
         color: white !important;
         border-color: var(--success) !important;
-      }
-
-      /* Botões de Ação Rápida IA */
-      .ai-quick-actions {
-        display: flex;
-        gap: 8px;
-        margin-top: 12px;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        scrollbar-width: none;
-      }
-      .ai-quick-actions::-webkit-scrollbar {
-        display: none;
-      }
-      .ai-quick-btn {
-        white-space: nowrap;
-        background: transparent;
-        border: 1px dashed var(--primary-color);
-        color: var(--primary-color);
-        font-size: 0.8rem;
-        font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-      .ai-quick-btn:hover {
-        background: var(--primary-color);
-        color: white;
-        border-style: solid;
-      }
-      [data-theme="dark"] .ai-quick-btn {
-        border-color: var(--primary-hover);
-        color: var(--primary-hover);
-      }
-      [data-theme="dark"] .ai-quick-btn:hover {
-        background: var(--primary-hover);
-        color: var(--bg-color);
       }
 
       .section-header {
@@ -1377,10 +1172,6 @@
           height: 40px;
           font-size: 1.2rem;
         } /* Aumentado Touch Target */
-        .ai-quick-btn {
-          padding: 10px 16px;
-          font-size: 0.9rem;
-        } /* Aumentado para facilitar clique na IA */
         .desktop-drag-handle {
           display: none !important;
         }
@@ -1754,12 +1545,11 @@
             </button>
           </section>
 
-          <!-- POMODORO CARD (Agora com Modo Zen) -->
+          <!-- POMODORO CARD -->
           <section
             class="panel-card pomodoro-card"
             style="text-align: center; position: relative"
           >
-            <!-- BOTÃO ZEN ADICIONADO -->
             <button
               class="zen-btn"
               onclick="toggleZenMode()"
@@ -1894,7 +1684,6 @@
                 <i class="ph-bold ph-floppy-disk"></i> Salvar
               </button>
             </div>
-            <!-- ETIQUETAS DO BLOCO DE NOTAS ADICIONADAS -->
             <div class="tags-container">
               <button class="tag-btn" onclick="insertTag('[Dúvida]')">
                 Dúvida
@@ -2197,161 +1986,6 @@
             </div>
             <div class="daily-log-list" id="daily-log-list"></div>
           </section>
-
-          <!-- NOVO: MENTOR IA (TIRA-DÚVIDAS AVANÇADO) -->
-          <section
-            class="panel-card"
-            style="padding: 1.5rem; grid-column: 1 / -1"
-          >
-            <div
-              class="panel-title"
-              style="justify-content: space-between; margin-bottom: 1rem"
-            >
-              <div style="display: flex; align-items: center; gap: 8px">
-                <i
-                  class="ph-fill ph-brain"
-                  style="color: var(--accent-color)"
-                ></i>
-                Mentor Tático IA
-              </div>
-              <div style="display: flex; gap: 8px">
-                <button
-                  class="btn-edit-small"
-                  onclick="configureAPIKey()"
-                  title="Configurar Chave API (Segurança)"
-                  style="
-                    width: auto;
-                    padding: 0 12px;
-                    border-radius: 15px;
-                    font-size: 0.8rem;
-                    font-weight: 600;
-                  "
-                >
-                  <i class="ph-bold ph-key"></i> API
-                </button>
-                <button
-                  class="btn-edit-small"
-                  onclick="clearChat()"
-                  title="Limpar Histórico"
-                  style="
-                    width: auto;
-                    padding: 0 12px;
-                    border-radius: 15px;
-                    font-size: 0.8rem;
-                    font-weight: 600;
-                  "
-                >
-                  <i class="ph-bold ph-trash"></i> Limpar
-                </button>
-              </div>
-            </div>
-
-            <div id="chat-container" class="chat-container">
-              <!-- O histórico será renderizado aqui pelo javascript -->
-            </div>
-
-            <!-- Input Redesenhado -->
-            <div
-              style="
-                display: flex;
-                gap: 8px;
-                margin-top: 10px;
-                background: var(--bg-color);
-                padding: 6px;
-                border-radius: 30px;
-                border: 1px solid var(--border-color);
-                align-items: center;
-                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-              "
-            >
-              <div style="padding-left: 10px; color: var(--text-muted)">
-                <i class="ph-bold ph-chat-teardrop-text"></i>
-              </div>
-              <input
-                type="text"
-                id="ai-input"
-                style="
-                  flex: 1;
-                  border: none;
-                  background: transparent;
-                  padding: 10px;
-                  color: var(--text-main);
-                  font-size: 0.95rem;
-                  outline: none;
-                "
-                placeholder="Qual a tua dúvida tática, Guerreiro?"
-                onkeydown="
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                    this.blur();
-                    askAI();
-                  }
-                "
-              />
-              <button
-                id="ai-btn"
-                class="btn-primary"
-                style="
-                  margin-top: 0;
-                  width: 40px;
-                  height: 40px;
-                  padding: 0;
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                "
-                onclick="askAI()"
-                title="Enviar pergunta"
-              >
-                <i class="ph-bold ph-paper-plane-right"></i>
-              </button>
-            </div>
-
-            <!-- Ações Rápidas de Elite -->
-            <div class="ai-quick-actions">
-              <button
-                class="ai-quick-btn"
-                onclick="
-                  sendQuickAction(
-                    '🎯 Gere uma questão inédita estilo CEBRASPE (Certo/Errado) sobre o núcleo duro da PRF, focada em pegadinhas comuns.',
-                  )
-                "
-              >
-                <i class="ph-bold ph-exam"></i> Gerar Questão CEBRASPE
-              </button>
-              <button
-                class="ai-quick-btn"
-                onclick="
-                  sendQuickAction(
-                    '📊 Analise o meu progresso de hoje com base nos meus dados e me dê um feedback tático curto (elogio ou cobrança).',
-                  )
-                "
-              >
-                <i class="ph-bold ph-chart-line-up"></i> Analisar Meu Progresso
-              </button>
-              <button
-                class="ai-quick-btn"
-                onclick="
-                  sendQuickAction(
-                    '🔥 Me dê um choque de realidade e motivação militar nível PRF para continuar estudando agora!',
-                  )
-                "
-              >
-                <i class="ph-bold ph-fire"></i> Motivação Militar
-              </button>
-              <button
-                class="ai-quick-btn"
-                onclick="
-                  sendQuickAction(
-                    '📚 Resuma os principais casos de exclusão de ilicitude e culpabilidade em tópicos diretos.',
-                  )
-                "
-              >
-                <i class="ph-bold ph-book-open"></i> Resumo Rápido
-              </button>
-            </div>
-          </section>
         </div>
 
         <header class="section-header">
@@ -2580,7 +2214,6 @@
         weeklyData: {},
         lastBackupReminder: null,
         questions: { correct: 0, wrong: 0, blank: 0 },
-        chatHistory: [], // Histórico de IA guardado na Cloud
         theme: "light", // Preferência de tema guardada na Cloud
         subjects: [
           {
@@ -2671,8 +2304,7 @@
           s.lastBackupReminder = null;
         if (typeof s.notes !== "string") s.notes = "";
 
-        // Garantias da Nuvem para o Histórico e Tema
-        if (!Array.isArray(s.chatHistory)) s.chatHistory = [];
+        // Garantias da Nuvem para Tema
         if (typeof s.theme !== "string") s.theme = "light";
 
         if (!Array.isArray(s.subjects) || s.subjects.length === 0) {
@@ -2854,7 +2486,6 @@
       }
 
       function initTheme() {
-        // Agora lê do state (se existir) para sincronizar com a cloud
         const savedTheme =
           window.appState.theme || localStorage.getItem("prfTheme") || "light";
         htmlDoc.setAttribute("data-theme", savedTheme);
@@ -2871,7 +2502,6 @@
         htmlDoc.setAttribute("data-theme", newTheme);
         localStorage.setItem("prfTheme", newTheme);
 
-        // Salva a nova preferência de tema no Firebase
         window.appState.theme = newTheme;
         saveData();
 
@@ -2999,7 +2629,6 @@
         showToast("Backup JSON exportado!", "success");
       }
 
-      // Função para Exportar dados em CSV (Excel)
       function exportCSV() {
         let csv = "Estatísticas PRF - Comando Central\n\n";
 
@@ -3019,7 +2648,6 @@
           csv += `"${s.name}",${s.watched},${s.total},${status}\n`;
         });
 
-        // Adiciona UTF-8 BOM para garantir que o Excel lê os acentos de Português corretamente
         const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csv], {
           type: "text/csv;charset=utf-8;",
         });
@@ -3204,7 +2832,6 @@
         if (!icon) return;
         const btn = icon.parentElement;
 
-        // Pede permissão para notificações na primeira vez que o utilizador clicar em Play
         requestNotificationPermission();
 
         if (isTimerRunning) {
@@ -3230,7 +2857,6 @@
               updateTimerDisplay();
               playAlarm();
 
-              // Emite a Notificação Push Nativa quando termina
               if (
                 "Notification" in window &&
                 Notification.permission === "granted"
@@ -3287,7 +2913,6 @@
         resetTimer();
       }
 
-      // Função de inserção rápida de etiquetas (Tags)
       function insertTag(tag) {
         const textarea = document.getElementById("tactical-notes");
         if (!textarea) return;
@@ -3298,10 +2923,8 @@
         const before = text.substring(0, start);
         const after = text.substring(end, text.length);
 
-        // Insere a tag e mete um espaço a seguir
         textarea.value = before + tag + " " + after;
 
-        // Coloca o cursor logo a seguir à tag inserida
         textarea.selectionStart = textarea.selectionEnd =
           start + tag.length + 1;
         textarea.focus();
@@ -3570,38 +3193,6 @@
         progressChart.update();
       }
 
-      // Função para renderizar o Chat guardado na Nuvem
-      window.renderChatHistory = function () {
-        const chatContainer = document.getElementById("chat-container");
-        if (!chatContainer) return;
-
-        let html = `
-          <div class="chat-bubble chat-ai">
-            <p><strong>Saudações, Guerreiro!</strong> 🦅</p>
-            <p>Sou o teu Mentor Tático especializado no concurso da PRF. Estou conectado aos teus dados de estudo e pronto para te ajudar a dominar Direito, Trânsito, RLM e muito mais.</p>
-            <p>Como posso ajudar na missão de hoje?</p>
-          </div>
-        `;
-
-        if (window.appState && window.appState.chatHistory) {
-          window.appState.chatHistory.forEach((msg) => {
-            if (msg.role === "user") {
-              html += `<div class="chat-bubble chat-user">${msg.content}</div>`;
-            } else {
-              // Verifica se marked existe antes de compilar
-              const content =
-                typeof marked !== "undefined"
-                  ? marked.parse(msg.content)
-                  : msg.content;
-              html += `<div class="chat-bubble chat-ai">${content}</div>`;
-            }
-          });
-        }
-
-        chatContainer.innerHTML = html;
-        scrollToBottom("chat-container");
-      };
-
       function renderDashboard() {
         try {
           const streakCountEl = document.getElementById("streak-count");
@@ -3753,308 +3344,21 @@
 
           if (progressChart) updateChartData();
           updateTimerDisplay();
-
-          // Renderiza o Histórico da Nuvem se houver
-          if (!isAILoading) {
-            window.renderChatHistory();
-          }
         } catch (error) {
           console.error("Erro na renderização:", error);
         }
       }
 
       document.addEventListener("keydown", (e) => {
-        // Atalho Tecla P (Pomodoro)
         if (
           e.target.tagName !== "INPUT" &&
           e.target.tagName !== "TEXTAREA" &&
           e.key.toLowerCase() === "p"
         )
           toggleTimer();
-        // Atalho Tecla ESC (Sair do Modo Zen)
         if (e.key === "Escape" && document.body.classList.contains("zen-mode"))
           toggleZenMode();
       });
-
-      // --- INTEGRAÇÃO DA INTELIGÊNCIA ARTIFICIAL (GEMINI API) COM CLOUD E TRATAMENTO DE ERROS APRIMORADO ---
-      let isAILoading = false;
-
-      function configureAPIKey() {
-        // Agora mostra a nova chave por defeito se não houver nenhuma no LocalStorage
-        const currentKey =
-          localStorage.getItem("prf_ai_api_key") ||
-          "AIzaSyBUYY_gYTpSlCoRzwSljx1CUyPC4eVch9A";
-        const msg =
-          "🔒 PROTEÇÃO DE DADOS\n\nPara não expor a sua chave no código fonte, insira-a aqui.\nEla ficará encriptada apenas no seu navegador (Local Storage).\n\nInsira a sua Chave API do Gemini (AIzaSy...):";
-        const newKey = prompt(msg, currentKey);
-
-        if (newKey !== null) {
-          if (newKey.trim() === "") {
-            localStorage.removeItem("prf_ai_api_key");
-            showToast("Chave API removida.", "info");
-          } else {
-            localStorage.setItem("prf_ai_api_key", newKey.trim());
-            showToast(
-              "Chave API guardada com segurança no seu dispositivo!",
-              "success",
-            );
-          }
-        }
-      }
-
-      function clearChat() {
-        window.appState.chatHistory = [];
-        saveData(); // Salva na Nuvem que o chat foi limpo
-        window.renderChatHistory();
-        showToast("Histórico limpo com sucesso.", "success");
-      }
-
-      function sendQuickAction(promptText) {
-        const inputEl = document.getElementById("ai-input");
-        if (inputEl) {
-          inputEl.value = promptText;
-          askAI();
-        }
-      }
-
-      // Função para garantir que o scroll desce suavemente
-      function scrollToBottom(elementId) {
-        const el = document.getElementById(elementId);
-        if (el) {
-          el.scrollTo({
-            top: el.scrollHeight,
-            behavior: "smooth",
-          });
-        }
-      }
-
-      // Observador para auto-scroll inteligente do Chat
-      function setupChatObserver() {
-        const chatContainer = document.getElementById("chat-container");
-        if (chatContainer) {
-          const observer = new MutationObserver(() => {
-            scrollToBottom("chat-container");
-          });
-          observer.observe(chatContainer, { childList: true, subtree: true });
-        }
-      }
-
-      async function askAI() {
-        if (isAILoading) return;
-
-        // RECUPERAÇÃO SEGURA: Busca a chave guardada, mas ignora-a caso seja uma das antigas que dava erro 404
-        let apiKey = localStorage.getItem("prf_ai_api_key");
-        if (
-          !apiKey ||
-          apiKey.includes("AIzaSyC6") ||
-          apiKey.includes("AIzaSyB5") ||
-          apiKey.includes("AIzaSyCOc5pi") ||
-          apiKey.length < 30
-        ) {
-          apiKey = "AIzaSyBUYY_gYTpSlCoRzwSljx1CUyPC4eVch9A"; // Força a nova chave do AI Studio
-          localStorage.setItem("prf_ai_api_key", apiKey); // Limpa o cache do navegador com a chave correta
-        }
-
-        const inputEl = document.getElementById("ai-input");
-        const chatContainer = document.getElementById("chat-container");
-        const btnEl = document.getElementById("ai-btn");
-        const query = inputEl.value.trim();
-
-        if (!query) {
-          showToast("Escreva a sua dúvida!", "warning");
-          return;
-        }
-
-        isAILoading = true;
-
-        if (window.appState.chatHistory.length > 20) {
-          window.appState.chatHistory.splice(0, 2); // Limita a memória para não sobrecarregar
-        }
-
-        // Regista a pergunta na Nuvem e Atualiza o ecrã
-        window.appState.chatHistory.push({ role: "user", content: query });
-        saveData();
-        window.renderChatHistory();
-
-        inputEl.value = "";
-        inputEl.disabled = true;
-        btnEl.disabled = true;
-        btnEl.style.opacity = "0.5";
-
-        const typingId = "typing-" + Date.now();
-        chatContainer.innerHTML += `
-              <div id="${typingId}" class="chat-bubble chat-ai">
-                  <div class="typing-indicator">
-                      <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
-                  </div>
-              </div>`;
-        scrollToBottom("chat-container");
-
-        // Atualizado para a versão "latest" para resolver incompatibilidades de 404 com novas chaves
-        let model = "gemini-1.5-flash-latest";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-        const activeSubjects =
-          window.appState.subjects
-            .filter((s) => s.active)
-            .map((s) => s.name)
-            .join(", ") || "Nenhuma";
-        const allSubjectsProgress = window.appState.subjects
-          .map((s) => {
-            const perc = ((s.watched / s.total) * 100).toFixed(1);
-            return `- ${s.name}: ${perc}% concluído (${s.watched}/${s.total})`;
-          })
-          .join("\n             ");
-
-        const userNotes = window.appState.notes
-          ? window.appState.notes
-          : "O aluno não tem anotações recentes.";
-
-        const progressContext = `
-             === CONTEXTO TÁTICO DO ALUNO ===
-             - Meta Diária: ${window.appState.dailyCount} de ${window.appState.dailyGoal} aulas concluídas hoje.
-             - Dias Seguidos (Streak): ${window.appState.streak} dias.
-             - Desempenho CEBRASPE: ${window.appState.questions.correct} Certas, ${window.appState.questions.wrong} Erradas, ${window.appState.questions.blank} Em Branco.
-             - Bloco de Notas Atual: "${userNotes}"
-             
-             - Progresso Detalhado do Edital:
-             ${allSubjectsProgress}
-             ================================
-          `;
-
-        const systemPrompt = `Você é o "Comando Central", um Mentor Tático de Elite e Especialista Absoluto no concurso da Polícia Rodoviária Federal (PRF) do Brasil. Sua única missão é forjar a aprovação do usuário.
-
-        CONTEXTO DO ALUNO:
-        ${progressContext}
-
-        DIRETRIZES DE ATUAÇÃO (MANDATÓRIAS):
-        1. Tom e Persona: Mantenha postura militar, disciplinadora, de alta performance ("Guerreiro", "Foco na missão"). Seja direto, cirúrgico e incisivo. Sem cordialidade excessiva.
-        2. Rigor Técnico (CEBRASPE): Para dúvidas de Direito, Trânsito ou Administração, aplique a jurisprudência pacificada (STF/STJ) e a literalidade da lei. Foque nas "pegadinhas" clássicas da banca CEBRASPE.
-        3. Formatação Impecável (Markdown):
-           - Use **negrito** para palavras-chave, prazos, maiorias e exceções legais.
-           - Estruture respostas complexas usando cabeçalhos (ex: ### ⚖️ Fundamento Legal, ### 🎯 Estratégia, ### ⚠️ Alerta CEBRASPE).
-           - Destaque citações importantes ou leis usando o formato blockquote (>).
-           - Use APENAS marcadores padrão ("- "). NUNCA use checklists interativos ("- [ ]").
-        4. Consciência Situacional: Analise os dados do painel do aluno. Se ele pedir planeamento ou estiver estagnado, cobre metas, aponte as matérias ativas mais atrasadas ou referencie o seu desempenho atual.
-        5. Fecho de Elite: Termine SEMPRE com uma instrução clara de "Próximo Passo" ou lance um item rápido (Certo/Errado) para testar a retenção imediata.
-        6. Tolerância Zero a Erros: NUNCA invente leis, súmulas ou dados estatísticos. Se a doutrina divergir, aponte a perspetiva adotada pelo CEBRASPE.`;
-
-        // Sistema avançado de formatação de histórico para o Gemini
-        // Evita o Erro 400 que acontece quando existem mensagens consecutivas do mesmo utilizador
-        const contents = [];
-        let lastRole = null;
-
-        // Pega apenas nas últimas 8 mensagens para manter a memória tática leve
-        const recentHistory = window.appState.chatHistory.slice(-8);
-
-        recentHistory.forEach((msg) => {
-          const role = msg.role === "assistant" ? "model" : "user";
-
-          // Se a role for igual à anterior, junta o texto em vez de criar novo bloco
-          if (role === lastRole && contents.length > 0) {
-            contents[contents.length - 1].parts[0].text += "\n\n" + msg.content;
-          } else {
-            contents.push({
-              role: role,
-              parts: [{ text: msg.content || " " }],
-            });
-            lastRole = role;
-          }
-        });
-
-        const payload = {
-          contents: contents,
-          systemInstruction: {
-            parts: [{ text: systemPrompt }],
-          },
-          generationConfig: {
-            temperature: 0.3, // Garante respostas factuais e precisas, ideal para o estudo jurídico
-          },
-        };
-
-        const fetchWithRetry = async (url, options, retries = 3) => {
-          let delay = 1000;
-          for (let i = 0; i < retries; i++) {
-            try {
-              const res = await fetch(url, options);
-              if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(`HTTP Error ${res.status}: ${errorText}`);
-              }
-              return await res.json();
-            } catch (e) {
-              if (i === retries - 1) throw e;
-              await new Promise((resolve) => setTimeout(resolve, delay));
-              delay *= 2;
-            }
-          }
-        };
-
-        try {
-          const response = await fetchWithRetry(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
-
-          const textResponse =
-            response.candidates?.[0]?.content?.parts?.[0]?.text ||
-            "Ocorreu um erro de transmissão. Repita a operação.";
-
-          // Remove o indicador de estar a escrever
-          const typingEl = document.getElementById(typingId);
-          if (typingEl) typingEl.remove();
-
-          // Guarda a resposta na nuvem mantendo o padrão universal e renderiza!
-          window.appState.chatHistory.push({
-            role: "assistant",
-            content: textResponse,
-          });
-          saveData();
-          window.renderChatHistory();
-        } catch (error) {
-          console.error("Erro detalhado na IA:", error);
-          const typingEl = document.getElementById(typingId);
-          if (typingEl) typingEl.remove();
-
-          let errorMsg =
-            "O servidor está ocupado ou ocorreu uma falha de rede. Tente novamente em instantes.";
-
-          // Análise Inteligente de Erros para guiar o utilizador diretamente à solução
-          if (error.message.includes("404")) {
-            errorMsg =
-              "<strong>Erro 404: IA não ativada ou modelo incorreto!</strong><br><br>Isto acontece quando a Chave API é gerada no Firebase em vez do Google AI Studio.<br><br>👉 <strong>Como resolver:</strong> Aceda a <a href='https://aistudio.google.com/app/apikey' target='_blank' style='color:var(--accent-color);text-decoration:underline;'>aistudio.google.com</a>, crie uma chave lá, volte ao painel, clique no botão <strong>API</strong> e insira a nova chave.";
-          } else if (
-            error.message.includes("403") ||
-            error.message.includes("blocked")
-          ) {
-            errorMsg =
-              "<strong>Erro 403: Bloqueio de Segurança!</strong><br><br>A sua chave API tem restrições HTTP que bloqueiam o Vercel.<br><br>👉 <strong>Como resolver:</strong> Aceda ao <a href='https://console.cloud.google.com/apis/credentials' target='_blank' style='color:var(--accent-color);text-decoration:underline;'>Google Cloud Console</a>, selecione a sua chave API e altere as <em>Restrições de Aplicação</em> para <strong>Nenhum</strong>.";
-          } else if (error.message.includes("API key not valid")) {
-            errorMsg =
-              "Chave API inválida. Clique no botão <strong>API</strong> para configurar a chave correta.";
-          }
-
-          chatContainer.innerHTML += `<div class="chat-bubble chat-ai" style="border-color: var(--danger);"><span style="color: var(--danger)"><i class="ph-bold ph-warning-circle"></i> ${errorMsg}</span><br><span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; display: block; border-top: 1px dashed var(--border-color); padding-top: 5px; word-break: break-all;"><strong>Log Técnico:</strong> ${error.message.substring(0, 180)}...</span></div>`;
-          showToast(
-            "Falha na ligação à IA. Leia as instruções no chat.",
-            "danger",
-          );
-
-          // Reverte a pergunta guardada na nuvem caso a IA falhe para evitar erros na próxima tentativa
-          window.appState.chatHistory.pop();
-          saveData();
-        } finally {
-          isAILoading = false;
-          inputEl.disabled = false;
-          btnEl.disabled = false;
-          btnEl.style.opacity = "1";
-          inputEl.focus();
-          scrollToBottom("chat-container");
-        }
-      }
 
       window.onload = () => {
         initTheme();
@@ -4063,7 +3367,6 @@
         checkBackupReminder();
         updateDailyQuote();
         renderDashboard();
-        setupChatObserver();
       };
     </script>
 
@@ -4205,7 +3508,6 @@
                           JSON.stringify(window.appState),
                         );
 
-                        // Atualiza o tema da interface se foi alterado noutro dispositivo
                         const currentHtmlTheme =
                           document.documentElement.getAttribute("data-theme");
                         if (
