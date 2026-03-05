@@ -77,6 +77,13 @@
           border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
+      /* PREVINE SCROLL HORIZONTAL EM MOBILE/TABLET */
+      html,
+      body {
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+
       body {
         background-color: var(--bg-color);
         color: var(--text-main);
@@ -1144,7 +1151,43 @@
         display: none !important;
       }
 
-      /* Melhoria de Acessibilidade Tátil (Touch Targets) no Mobile */
+      /* Melhoria de Acessibilidade Tátil (Touch Targets) no Mobile e Ajustes Responsivos */
+      @media (max-width: 1024px) {
+        .dashboard-grid {
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+        .tools-grid {
+          grid-template-columns: 1fr; /* Força uma coluna no tablet para não amontoar */
+        }
+        .grid-subjects {
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        }
+      }
+
+      @media (max-width: 768px) {
+        .navbar {
+          padding: 1rem;
+          flex-wrap: wrap; /* Permite que os itens da nav vão para a linha de baixo se faltar espaço */
+          gap: 10px;
+        }
+        .nav-controls {
+          flex-wrap: wrap;
+          justify-content: center;
+          width: 100%;
+        }
+        .header-user-area {
+          align-items: center;
+          width: 100%;
+          margin-top: 10px;
+          border-top: 1px dashed var(--border-color);
+          padding-top: 10px;
+        }
+        .motivational-quote {
+          text-align: center;
+          max-width: 100%;
+        }
+      }
+
       @media (max-width: 650px) {
         .hide-mobile {
           display: none !important;
@@ -1152,50 +1195,74 @@
         .show-mobile {
           display: flex !important;
         }
+        .container {
+          padding: 0 1rem; /* Reduz o padding lateral para ganhar espaço */
+          margin-top: 1.5rem;
+        }
+        .grid-subjects {
+          grid-template-columns: 1fr; /* Força 1 única coluna no telemóvel para não espremer/transbordar */
+        }
         .navbar {
-          padding: 1rem 0.8rem;
+          padding: 0.8rem;
+          flex-direction: column; /* Empilha logo e botões no telemóvel */
+          align-items: center;
+          gap: 15px;
         }
         .nav-controls {
           gap: 0.5rem;
+          justify-content: center;
         }
         .action-icon-btn {
-          font-size: 1.2rem;
-          padding: 4px;
+          font-size: 1.3rem; /* Aumentado ligeiramente para toque */
+          padding: 8px; /* Maior área de toque */
         }
         .stepper-btn {
-          width: 44px;
+          width: 48px; /* Aumentado Touch Target */
+          height: 48px;
+          font-size: 1.4rem;
+        }
+        .btn-edit-small {
+          width: 44px; /* Aumentado Touch Target */
           height: 44px;
           font-size: 1.3rem;
-        } /* Aumentado Touch Target */
-        .btn-edit-small {
-          width: 40px;
-          height: 40px;
-          font-size: 1.2rem;
-        } /* Aumentado Touch Target */
+        }
         .desktop-drag-handle {
           display: none !important;
         }
         .mobile-order-controls {
           display: flex !important;
           flex-direction: column;
-          gap: 4px;
+          gap: 6px; /* Mais espaço entre os botões de ordem */
         }
         .mobile-order-btn {
           background: var(--bg-color);
           border: 1px solid var(--border-color);
-          border-radius: 4px;
-          padding: 8px 12px;
+          border-radius: 6px;
+          padding: 10px 14px; /* Aumentado Touch Target */
           color: var(--text-muted);
-          font-size: 1rem;
+          font-size: 1.1rem;
           cursor: pointer;
-          min-height: 40px;
+          min-height: 44px;
           display: flex;
           align-items: center;
           justify-content: center;
-        } /* Aumentado Touch Target */
+        }
         .mobile-order-btn:active {
           background: var(--primary-color);
           color: white;
+        }
+        .subject-card {
+          padding: 1.2rem; /* Reduz padding para caber melhor no ecrã pequeno */
+        }
+        .panel-card {
+          padding: 1.2rem;
+        }
+        .timer-display {
+          font-size: 3.5rem; /* Ajusta tamanho do cronómetro */
+        }
+        .modal-content {
+          padding: 1.5rem;
+          width: 95%;
         }
       }
       @media (min-width: 651px) {
@@ -2131,6 +2198,11 @@
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
     <script>
+      // ==========================================
+      // CONFIGURAÇÃO DA DATA DE INÍCIO DOS ESTUDOS
+      // ==========================================
+      const DATA_INICIO_ESTUDOS = new Date("2026-03-09T00:00:00");
+
       let draggedId = null;
 
       function handleDragStart(e) {
@@ -2602,13 +2674,14 @@
         "Sua constância é o seu maior trunfo.",
       ];
       function updateDailyQuote() {
-        const d = Math.floor(
-          (new Date() - new Date(new Date().getFullYear(), 0, 0)) /
-            1000 /
-            60 /
-            60 /
-            24,
-        );
+        const today = new Date();
+        let d = 0;
+
+        // Sincroniza a citação do dia com a data de início oficial
+        if (today >= DATA_INICIO_ESTUDOS) {
+          d = Math.floor((today - DATA_INICIO_ESTUDOS) / (1000 * 60 * 60 * 24));
+        }
+
         const quoteEl = document.getElementById("daily-quote");
         if (quoteEl) quoteEl.innerText = '"' + quotes[d % quotes.length] + '"';
       }
@@ -3176,11 +3249,16 @@
         if (predictionTextEl) {
           if (pend === 0) predictionTextEl.innerHTML = `🎉 Edital Finalizado!`;
           else if (window.appState.dailyGoal > 0) {
-            const d = new Date();
-            d.setDate(
-              d.getDate() + Math.ceil(pend / window.appState.dailyGoal),
+            const today = new Date();
+            // Se a data atual for antes do início, a previsão conta a partir da data de início
+            const baseDate =
+              today < DATA_INICIO_ESTUDOS
+                ? new Date(DATA_INICIO_ESTUDOS)
+                : new Date();
+            baseDate.setDate(
+              baseDate.getDate() + Math.ceil(pend / window.appState.dailyGoal),
             );
-            predictionTextEl.innerHTML = `🎯 Previsão: <strong style="color:var(--primary-color)">${d.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}</strong>`;
+            predictionTextEl.innerHTML = `🎯 Previsão: <strong style="color:var(--primary-color)">${baseDate.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}</strong>`;
           }
         }
         updateWeeklyChart();
@@ -3367,6 +3445,23 @@
         checkBackupReminder();
         updateDailyQuote();
         renderDashboard();
+
+        // Alerta de contagem regressiva para o início dos estudos
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const start = new Date(DATA_INICIO_ESTUDOS);
+        start.setHours(0, 0, 0, 0);
+
+        if (today < start) {
+          const diffTime = Math.abs(start - today);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          setTimeout(() => {
+            showToast(
+              `Foco na missão! Faltam ${diffDays} dias para o início oficial dos estudos (09/03). 🚀`,
+              "info",
+            );
+          }, 1500);
+        }
       };
     </script>
 
