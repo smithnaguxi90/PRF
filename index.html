@@ -2961,7 +2961,7 @@
         "Vença a si mesmo todos os dias.",
         "O preço da excelência é a disciplina.",
         "A dor da disciplina é menor que a dor do arrependimento.",
-        "A farda tem o seu peso, prepare os shoulders.",
+        "A farda tem o seu peso, prepare os ombros.",
         "Sorte é o nome que dão ao seu esforço não visto.",
         "A aprovação é construída no silêncio do seu quarto.",
         "Missão dada é missão cumprida.",
@@ -3776,21 +3776,29 @@
           toggleZenMode();
       });
 
-      // --- INTEGRAÇÃO DA INTELIGÊNCIA ARTIFICIAL (OPENAI API) COM CLOUD ---
+      // --- INTEGRAÇÃO DA INTELIGÊNCIA ARTIFICIAL (GEMINI API) COM CLOUD E TRATAMENTO DE ERROS APRIMORADO ---
       let isAILoading = false;
 
       function configureAPIKey() {
-        const currentKey = localStorage.getItem("prf_ai_api_key") || "";
+        // Agora mostra a nova chave por defeito se não houver nenhuma no LocalStorage
+        const currentKey =
+          localStorage.getItem("prf_ai_api_key") ||
+          "AIzaSyBUYY_gYTpSlCoRzwSljx1CUyPC4eVch9A";
         const msg =
           "🔒 PROTEÇÃO DE DADOS\n\nPara não expor a sua chave no código fonte, insira-a aqui.\nEla ficará encriptada apenas no seu navegador (Local Storage).\n\nInsira a sua Chave API do Gemini (AIzaSy...):";
         const newKey = prompt(msg, currentKey);
 
         if (newKey !== null) {
-          localStorage.setItem("prf_ai_api_key", newKey.trim());
-          showToast(
-            "Chave API guardada com segurança no seu dispositivo!",
-            "success",
-          );
+          if (newKey.trim() === "") {
+            localStorage.removeItem("prf_ai_api_key");
+            showToast("Chave API removida.", "info");
+          } else {
+            localStorage.setItem("prf_ai_api_key", newKey.trim());
+            showToast(
+              "Chave API guardada com segurança no seu dispositivo!",
+              "success",
+            );
+          }
         }
       }
 
@@ -3834,6 +3842,19 @@
       async function askAI() {
         if (isAILoading) return;
 
+        // RECUPERAÇÃO SEGURA: Busca a chave guardada, mas ignora-a caso seja uma das antigas que dava erro 404
+        let apiKey = localStorage.getItem("prf_ai_api_key");
+        if (
+          !apiKey ||
+          apiKey.includes("AIzaSyC6") ||
+          apiKey.includes("AIzaSyB5") ||
+          apiKey.includes("AIzaSyCOc5pi") ||
+          apiKey.length < 30
+        ) {
+          apiKey = "AIzaSyBUYY_gYTpSlCoRzwSljx1CUyPC4eVch9A"; // Força a nova chave do AI Studio
+          localStorage.setItem("prf_ai_api_key", apiKey); // Limpa o cache do navegador com a chave correta
+        }
+
         const inputEl = document.getElementById("ai-input");
         const chatContainer = document.getElementById("chat-container");
         const btnEl = document.getElementById("ai-btn");
@@ -3869,14 +3890,8 @@
               </div>`;
         scrollToBottom("chat-container");
 
-        // Segurança de Dados: Obter chave API do LocalStorage do utilizador
-        let apiKey = localStorage.getItem("prf_ai_api_key") || "";
-
-        // Se houver uma chave do utilizador configurada, usar o modelo de produção estável.
-        // Caso contrário, utilizar o fallback vazio para o ambiente de testes do Canvas.
-        let model = apiKey
-          ? "gemini-1.5-flash"
-          : "gemini-2.5-flash-preview-09-2025";
+        // Atualizado para a versão "latest" para resolver incompatibilidades de 404 com novas chaves
+        let model = "gemini-1.5-flash-latest";
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
         const activeSubjects =
@@ -3924,14 +3939,31 @@
         5. Fecho de Elite: Termine SEMPRE com uma instrução clara de "Próximo Passo" ou lance um item rápido (Certo/Errado) para testar a retenção imediata.
         6. Tolerância Zero a Erros: NUNCA invente leis, súmulas ou dados estatísticos. Se a doutrina divergir, aponte a perspetiva adotada pelo CEBRASPE.`;
 
-        // Normalizar histórico universal (da nuvem) para o formato exigido pelo Gemini
-        const formattedHistory = window.appState.chatHistory.map((msg) => ({
-          role: msg.role === "assistant" ? "model" : "user",
-          parts: [{ text: msg.content || "" }],
-        }));
+        // Sistema avançado de formatação de histórico para o Gemini
+        // Evita o Erro 400 que acontece quando existem mensagens consecutivas do mesmo utilizador
+        const contents = [];
+        let lastRole = null;
+
+        // Pega apenas nas últimas 8 mensagens para manter a memória tática leve
+        const recentHistory = window.appState.chatHistory.slice(-8);
+
+        recentHistory.forEach((msg) => {
+          const role = msg.role === "assistant" ? "model" : "user";
+
+          // Se a role for igual à anterior, junta o texto em vez de criar novo bloco
+          if (role === lastRole && contents.length > 0) {
+            contents[contents.length - 1].parts[0].text += "\n\n" + msg.content;
+          } else {
+            contents.push({
+              role: role,
+              parts: [{ text: msg.content || " " }],
+            });
+            lastRole = role;
+          }
+        });
 
         const payload = {
-          contents: formattedHistory,
+          contents: contents,
           systemInstruction: {
             parts: [{ text: systemPrompt }],
           },
@@ -3940,7 +3972,7 @@
           },
         };
 
-        const fetchWithRetry = async (url, options, retries = 5) => {
+        const fetchWithRetry = async (url, options, retries = 3) => {
           let delay = 1000;
           for (let i = 0; i < retries; i++) {
             try {
@@ -3989,15 +4021,27 @@
 
           let errorMsg =
             "O servidor está ocupado ou ocorreu uma falha de rede. Tente novamente em instantes.";
+
+          // Análise Inteligente de Erros para guiar o utilizador diretamente à solução
           if (error.message.includes("404")) {
             errorMsg =
-              "Erro 404: Modelo não encontrado ou API Key sem permissão.";
-          } else if (error.message.includes("403")) {
-            errorMsg = "Acesso negado (Erro 403). Verifique a sua API Key.";
+              "<strong>Erro 404: IA não ativada ou modelo incorreto!</strong><br><br>Isto acontece quando a Chave API é gerada no Firebase em vez do Google AI Studio.<br><br>👉 <strong>Como resolver:</strong> Aceda a <a href='https://aistudio.google.com/app/apikey' target='_blank' style='color:var(--accent-color);text-decoration:underline;'>aistudio.google.com</a>, crie uma chave lá, volte ao painel, clique no botão <strong>API</strong> e insira a nova chave.";
+          } else if (
+            error.message.includes("403") ||
+            error.message.includes("blocked")
+          ) {
+            errorMsg =
+              "<strong>Erro 403: Bloqueio de Segurança!</strong><br><br>A sua chave API tem restrições HTTP que bloqueiam o Vercel.<br><br>👉 <strong>Como resolver:</strong> Aceda ao <a href='https://console.cloud.google.com/apis/credentials' target='_blank' style='color:var(--accent-color);text-decoration:underline;'>Google Cloud Console</a>, selecione a sua chave API e altere as <em>Restrições de Aplicação</em> para <strong>Nenhum</strong>.";
+          } else if (error.message.includes("API key not valid")) {
+            errorMsg =
+              "Chave API inválida. Clique no botão <strong>API</strong> para configurar a chave correta.";
           }
 
-          chatContainer.innerHTML += `<div class="chat-bubble chat-ai"><span style="color: var(--danger)"><i class="ph-bold ph-warning-circle"></i> ${errorMsg}</span><br><span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; display: block; border-top: 1px dashed var(--border-color); padding-top: 5px;"><strong>Log do Sistema:</strong> ${error.message.substring(0, 150)}...</span></div>`;
-          showToast("Falha na ligação à IA.", "danger");
+          chatContainer.innerHTML += `<div class="chat-bubble chat-ai" style="border-color: var(--danger);"><span style="color: var(--danger)"><i class="ph-bold ph-warning-circle"></i> ${errorMsg}</span><br><span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; display: block; border-top: 1px dashed var(--border-color); padding-top: 5px; word-break: break-all;"><strong>Log Técnico:</strong> ${error.message.substring(0, 180)}...</span></div>`;
+          showToast(
+            "Falha na ligação à IA. Leia as instruções no chat.",
+            "danger",
+          );
 
           // Reverte a pergunta guardada na nuvem caso a IA falhe para evitar erros na próxima tentativa
           window.appState.chatHistory.pop();
