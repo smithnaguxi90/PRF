@@ -962,6 +962,48 @@
         }
       }
 
+      /* BOTAO VOLTAR AO TOPO */
+      .btn-back-to-top {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        z-index: 9000;
+      }
+      .btn-back-to-top.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      .btn-back-to-top.show:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-3px) scale(1.05);
+      }
+      @media (max-width: 650px) {
+        .btn-back-to-top {
+          bottom: 20px;
+          right: 20px;
+          width: 45px;
+          height: 45px;
+          font-size: 1.3rem;
+        }
+      }
+
       .pulse-animation {
         animation: pulse 1.5s infinite;
         box-shadow: 0 0 0 0 rgba(0, 40, 85, 0.4);
@@ -2022,6 +2064,17 @@
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
+    <!-- BOTAO VOLTAR AO TOPO -->
+    <button
+      id="btn-back-to-top"
+      class="btn-back-to-top"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+      title="Voltar ao topo"
+      aria-label="Voltar ao topo"
+    >
+      <i class="ph-bold ph-arrow-up"></i>
+    </button>
+
     <script>
       // ==========================================
       // CACHE DOM PARA OTIMIZAÇÃO (Performance)
@@ -2922,6 +2975,18 @@
             document.body.classList.contains("zen-mode")
           )
             toggleZenMode();
+        }
+      });
+
+      // Lógica do botão Voltar ao Topo
+      window.addEventListener("scroll", () => {
+        const btnTop = document.getElementById("btn-back-to-top");
+        if (btnTop) {
+          if (window.scrollY > 300) {
+            btnTop.classList.add("show");
+          } else {
+            btnTop.classList.remove("show");
+          }
         }
       });
 
