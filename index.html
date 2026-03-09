@@ -2169,6 +2169,38 @@
             active: false,
             questions: { correct: 0, wrong: 0, blank: 0 },
           },
+          {
+            id: 6,
+            name: "Noções de Administração",
+            watched: 0,
+            total: 65,
+            active: false,
+            questions: { correct: 0, wrong: 0, blank: 0 },
+          },
+          {
+            id: 7,
+            name: "Noções de Arquivologia",
+            watched: 0,
+            total: 37,
+            active: false,
+            questions: { correct: 0, wrong: 0, blank: 0 },
+          },
+          {
+            id: 8,
+            name: "Ética e Conduta Pública",
+            watched: 0,
+            total: 36,
+            active: false,
+            questions: { correct: 0, wrong: 0, blank: 0 },
+          },
+          {
+            id: 9,
+            name: "Legislação Relativa à PRF",
+            watched: 0,
+            total: 6,
+            active: false,
+            questions: { correct: 0, wrong: 0, blank: 0 },
+          },
         ],
       };
 
@@ -2187,6 +2219,13 @@
             if (!sub.questions)
               sub.questions = { correct: 0, wrong: 0, blank: 0 }; // Migração
             return sub;
+          });
+
+          // Recuperação automática de matérias omitidas
+          defaultState.subjects.forEach((defSub) => {
+            if (!s.subjects.find((userSub) => userSub.id === defSub.id)) {
+              s.subjects.push(JSON.parse(JSON.stringify(defSub)));
+            }
           });
         }
         return s;
