@@ -2584,6 +2584,52 @@
         saveData();
       }
 
+      // FUNÇÕES DO BLOCO TÁTICO
+      function insertTag(tag) {
+        if (!DOM.notes) return;
+        const start = DOM.notes.selectionStart;
+        const end = DOM.notes.selectionEnd;
+        const text = DOM.notes.value;
+        DOM.notes.value =
+          text.substring(0, start) +
+          tag +
+          " " +
+          text.substring(end, text.length);
+        DOM.notes.selectionStart = DOM.notes.selectionEnd =
+          start + tag.length + 1;
+        DOM.notes.focus();
+        autoSaveNotes();
+      }
+
+      function autoSaveNotes() {
+        if (DOM.notes) {
+          window.appState.notes = DOM.notes.value;
+          localStorage.setItem(
+            "prfDashboardState",
+            JSON.stringify(window.appState),
+          );
+          if (typeof window.saveToFirebase === "function")
+            window.saveToFirebase();
+        }
+      }
+
+      function manualSaveNotes() {
+        autoSaveNotes();
+        const btn = document.querySelector(
+          'button[onclick="manualSaveNotes()"]',
+        );
+        if (btn) {
+          const originalHtml = btn.innerHTML;
+          btn.innerHTML = `<i class="ph-bold ph-check"></i> Salvo`;
+          btn.classList.add("btn-saving");
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.classList.remove("btn-saving");
+          }, 1500);
+        }
+        showToast("Notas salvas com sucesso!", "success");
+      }
+
       // SISTEMA DE UNDO (Desfazer)
       function undoLastAction() {
         if (
@@ -2856,6 +2902,10 @@
         document.getElementById("pomodoro-marks").innerText = "🍅 ".repeat(
           window.appState.pomodorosToday,
         );
+
+        if (DOM.notes && document.activeElement !== DOM.notes) {
+          DOM.notes.value = window.appState.notes || "";
+        }
 
         // Render CEBRASPE Dinâmico (Global vs Matéria)
         const selectEl = document.getElementById("q-subject-select");
