@@ -1648,7 +1648,7 @@
 
           <section class="panel-card">
             <div class="panel-title">
-              <i class="ph-fill ph-chart-bar"></i> Produtividade (7 Dias)
+              <i class="ph-fill ph-chart-bar"></i> Produtividade (Semana Atual)
             </div>
             <div class="chart-container" style="height: 170px">
               <canvas id="weeklyChart"></canvas>
@@ -2307,6 +2307,130 @@
         }
       }
 
+      // 🛠️ CORREÇÃO 1: Timezone Fix + Restauração das Metas e Backup
+      function getLocalISODate(d = new Date()) {
+        const offset = d.getTimezoneOffset() * 60000;
+        return new Date(d.getTime() - offset).toISOString().split("T")[0];
+      }
+
+      function handleGoalMet() {
+        const todayStr = new Date().toDateString();
+        if (window.appState.lastGoalDate !== todayStr) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (window.appState.lastGoalDate === yesterday.toDateString())
+            window.appState.streak++;
+          else window.appState.streak = 1;
+          window.appState.lastGoalDate = todayStr;
+        }
+        showToast("Excepcional! Meta diária atingida! 🚀", "success");
+        triggerConfetti();
+      }
+
+      function addDailyGoal() {
+        if (DOM.btnGoal && !DOM.btnGoal.disabled) {
+          DOM.btnGoal.classList.add("pulse-animation");
+          setTimeout(
+            () => DOM.btnGoal.classList.remove("pulse-animation"),
+            600,
+          );
+        }
+        if (window.appState.dailyCount < window.appState.dailyGoal) {
+          window.appState.dailyCount++;
+          addLog("🎯 Registrou aula na Meta Diária (avulso).");
+          const isoDate = getLocalISODate(); // Correção do Timezone
+          window.appState.weeklyData[isoDate] =
+            (window.appState.weeklyData[isoDate] || 0) + 1;
+          if (window.appState.dailyCount === window.appState.dailyGoal)
+            handleGoalMet();
+          saveData();
+        }
+      }
+
+      function editDailyGoal() {
+        const input = prompt(
+          "Sua nova meta diária:",
+          window.appState.dailyGoal,
+        );
+        if (input === null) return;
+        const newG = parseInt(input.trim());
+        if (!isNaN(newG) && newG > 0) {
+          window.appState.dailyGoal = newG;
+          saveData();
+          showToast("Meta atualizada!", "success");
+        } else {
+          showToast("A meta diária deve ser maior que zero.", "warning");
+        }
+      }
+
+      function exportData() {
+        const dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(window.appState));
+        const dl = document.createElement("a");
+        dl.setAttribute("href", dataStr);
+        dl.setAttribute(
+          "download",
+          "prf_backup_" + getLocalISODate() + ".json",
+        );
+        document.body.appendChild(dl);
+        dl.click();
+        dl.remove();
+        showToast("Backup JSON exportado!", "success");
+      }
+
+      function exportCSV() {
+        let csv =
+          "Estatísticas PRF - Comando Central\n\n--- DESEMPENHO NO SIMULADOR ---\n";
+        const c = window.appState.questions.correct || 0,
+          w = window.appState.questions.wrong || 0,
+          b = window.appState.questions.blank || 0;
+        csv += `Certas,${c}\nErradas,${w}\nEm Branco,${b}\nNota Líquida,${c - w}\n\n--- PROGRESSO DO EDITAL ---\nDisciplina,Aulas Assistidas,Total,Status\n`;
+        window.appState.subjects.forEach(
+          (s) =>
+            (csv += `"${s.name}",${s.watched},${s.total},${s.watched === s.total ? "Concluído" : "Pendente"}\n`),
+        );
+
+        const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csv], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const dl = document.createElement("a");
+        dl.setAttribute("href", URL.createObjectURL(blob));
+        dl.setAttribute(
+          "download",
+          "prf_estatisticas_" + getLocalISODate() + ".csv",
+        );
+        document.body.appendChild(dl);
+        dl.click();
+        dl.remove();
+        showToast("Relatório CSV exportado!", "success");
+      }
+
+      function triggerImport() {
+        document.getElementById("import-file").click();
+      }
+      function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const imported = JSON.parse(e.target.result);
+            if (imported.subjects && imported.dailyGoal) {
+              localStorage.setItem(
+                "prfDashboardState",
+                JSON.stringify(imported),
+              );
+              showToast("Dados recuperados!", "success");
+              setTimeout(() => location.reload(), 1000);
+            }
+          } catch (err) {
+            showToast("Erro de leitura.", "danger");
+          }
+        };
+        reader.readAsText(file);
+      }
+
       function addSubject() {
         const name = prompt("Nome da nova disciplina:");
         if (!name || name.trim() === "") return;
@@ -2646,7 +2770,9 @@
           );
           if (sub) {
             sub.watched -= lastAction.diff;
-            const isoDate = new Date().toISOString().split("T")[0];
+
+            // 🛠️ CORREÇÃO 2: Aplicando a data local no Undo
+            const isoDate = getLocalISODate();
             window.appState.weeklyData[isoDate] = Math.max(
               0,
               (window.appState.weeklyData[isoDate] || 0) - lastAction.diff,
@@ -2692,7 +2818,8 @@
             : `✖ ${diff} aula(s) de ${sub.name}.`,
         );
 
-        const isoDate = new Date().toISOString().split("T")[0];
+        // 🛠️ CORREÇÃO 3: Aplicando a data local no Update
+        const isoDate = getLocalISODate();
         window.appState.weeklyData[isoDate] = Math.max(
           0,
           (window.appState.weeklyData[isoDate] || 0) + diff,
@@ -2834,10 +2961,15 @@
           document.documentElement.getAttribute("data-theme") === "dark"
             ? "#3b82f6"
             : "#002855";
-        for (let i = 6; i >= 0; i--) {
+        const today = new Date();
+        const currentDayOfWeek = today.getDay(); // 0 = Domingo
+        for (let i = 0; i <= 6; i++) {
           const d = new Date();
-          d.setDate(d.getDate() - i);
-          const iso = d.toISOString().split("T")[0];
+          d.setDate(today.getDate() - currentDayOfWeek + i);
+
+          // 🛠️ CORREÇÃO 4: Aplicando a data local no Gráfico Semanal
+          const iso = getLocalISODate(d);
+
           labels.push(
             d
               .toLocaleDateString("pt-BR", { weekday: "short" })
