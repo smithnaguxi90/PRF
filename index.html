@@ -2899,7 +2899,9 @@
           `/${window.appState.dailyGoal}`;
         document.getElementById("meta-fill").style.width =
           `${Math.min(100, (window.appState.dailyCount / window.appState.dailyGoal) * 100)}%`;
-        document.getElementById("pomodoro-marks").innerText = "🍅 ".repeat(
+
+        // ALTERAÇÃO AQUI: Trocando o ícone pelo emoji de Escudo
+        document.getElementById("pomodoro-marks").innerText = "🛡️ ".repeat(
           window.appState.pomodorosToday,
         );
 
