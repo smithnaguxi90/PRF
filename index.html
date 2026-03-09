@@ -2417,6 +2417,27 @@
         } catch (e) {}
       }
 
+      function configPomodoro() {
+        const study = parseInt(
+          prompt(
+            "Minutos de Foco (Ex: 50):",
+            window.appState.pomodoroSettings.study,
+          ),
+        );
+        if (isNaN(study) || study <= 0) return;
+        const brk = parseInt(
+          prompt(
+            "Minutos de Pausa (Ex: 10):",
+            window.appState.pomodoroSettings.break,
+          ),
+        );
+        if (isNaN(brk) || brk <= 0) return;
+        window.appState.pomodoroSettings = { study, break: brk };
+        saveData();
+        showToast("Pomodoro configurado!", "success");
+        if (!PomodoroEngine.isRunning) PomodoroEngine.reset();
+      }
+
       // Pomodoro Engine (Otimizado)
       let currentMode = "study";
       let timeLeft = window.appState.pomodoroSettings.study * 60;
