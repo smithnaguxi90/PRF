@@ -2848,6 +2848,7 @@
           saveData();
         }
       }
+      window.checkNewDay = checkNewDay; // 🛠️ CORREÇÃO: Garantir acesso global à função
 
       // GRÁFICOS
       let progressChart, weeklyChart, subjectAccuracyChart;
@@ -3138,6 +3139,7 @@
         if (progressChart) updateChartData();
         updateTimerDisplay();
       }
+      window.renderDashboard = renderDashboard; // 🛠️ CORREÇÃO: Garantir acesso global à função
 
       // Atalhos de Teclado
       document.addEventListener("keydown", (e) => {
@@ -3311,7 +3313,13 @@
                     );
                     localStorage.setItem("prfTheme", window.appState.theme);
                   }
-                  window.renderDashboard();
+
+                  // 🛠️ CORREÇÃO: Verificar se o backup da nuvem é de um dia anterior e reiniciar se necessário!
+                  if (typeof window.checkNewDay === "function")
+                    window.checkNewDay();
+
+                  if (typeof window.renderDashboard === "function")
+                    window.renderDashboard();
                 }
               },
               (err) => setConnectionStatus("local"),
